@@ -6,6 +6,6 @@ import (
 )
 
 func main() {
-	beego.Router("/feedback", &controllers.FeedbackController{}, "post:SaveFeedbackForm")
+	beego.Router("/repairs", &controllers.RepairController{}, "post:SaveRepairForm")
 	beego.Run()
 }
