@@ -1,0 +1,17 @@
+hash: 28e860d377a5a3000786f629cdf4e9073a9a9da942796d03b3ee6394c50953ee
+updated: 2017-10-01T20:58:28.115611928+08:00
+imports:
+- name: github.com/astaxie/beego
+  version: 3162da131da68f38e85765781c9d1cc419963e67
+  subpackages:
+  - config
+  - context
+  - context/param
+  - grace
+  - logs
+  - session
+  - toolbox
+  - utils
+- name: gopkg.in/mgo.v2
+  version: 3f83fa5005286a7fe593b055f0d7771a7dce4655
+testImports: []
