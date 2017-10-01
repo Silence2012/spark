@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"../constants"
 	"errors"
+	"../models"
 )
 
 type RepairController struct {
@@ -95,6 +96,27 @@ func (this *RepairController) SaveRepairForm() {
 	//附件文档
 	//TODO, 这里要支持录视频和拍照片， 以及上传文件
 
+	var repairForm map[string]string
+	repairForm = make(map[string]string)
+	repairForm[constants.Company] = company
+	repairForm[constants.Region] = region
+	repairForm[constants.Name] = name
+	repairForm[constants.Mobile] = mobile
+	repairForm[constants.Email] = email
+	repairForm[constants.Industry] = industry
+	repairForm[constants.Serial] = serial
+	repairForm[constants.FirstDeviceType] = firstDeviceType
+	repairForm[constants.SecondDeviceType] = secondDeviceType
+	repairForm[constants.BillAddress] = billAddress
+	repairForm[constants.CompanyAddress] = companyAddress
+	repairForm[constants.BugDetail] = bugDetail
+
+	addErr := models.AddRepairForm(repairForm)
+	if addErr != nil {
+		this.HandleError(result, addErr)
+	}
+
+	//TODO 生成订单号
 
 	result[constants.DETAIL] = name
 	response, _ := json.Marshal(result)
