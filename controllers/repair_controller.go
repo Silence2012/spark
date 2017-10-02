@@ -116,13 +116,57 @@ func (this *RepairController) SaveRepairForm() {
 		this.HandleError(result, addErr)
 	}
 
-	//TODO 生成订单号
+	//生成订单号
+	orderPrefix := GenerateOrderPrefix(industry)
+	orderNumber, orderErr := models.GenerateRepairFormOrder(orderPrefix)
+	if orderErr != nil {
+		this.HandleError(result, orderErr)
+	}
+	this.Ctx.ResponseWriter.Write([]byte(orderNumber))
 
-	result[constants.DETAIL] = name
-	response, _ := json.Marshal(result)
-	this.Ctx.ResponseWriter.Write(response)
 
+}
 
+func GenerateOrderPrefix(industry string) string {
+	//化工品和药品	订单生成首字母T
+	//涂布复合	订单生成首字母P
+	//薄膜和片材挤出	订单生成首字母P
+	//食品加工	订单生成首字母T
+	//冶金工业	订单生成首字母M
+	//矿石和松散物	订单生成首字母T
+	//无纺布和纺织品	订单生成首字母P
+	//软管及管材	订单生成首字母C
+	//橡胶和乙烯基压延	订单生成首字母P
+	//烟草加工	订单生成首字母T
+	//电线，电缆和光纤	订单生成首字母C
+	//其他	订单生成首字母O
+
+	switch industry {
+	case "化工品和药品":
+		return "T"
+	case "涂布复合":
+		return "P"
+	case "薄膜和片材挤出":
+		return "P"
+	case "食品加工":
+		return "T"
+	case "冶金工业":
+		return "M"
+	case "矿石和松散物":
+		return "T"
+	case "无纺布和纺织品":
+		return "P"
+	case "软管及管材":
+		return "C"
+	case "橡胶和乙烯基压延":
+		return "P"
+	case "烟草加工":
+		return "T"
+	case "电线，电缆和光纤":
+		return "C"
+	default:
+		return "O"
+	}
 }
 
 

@@ -1,12 +1,13 @@
 package models
 
 import (
-	"log"
-	"fmt"
+
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 	"github.com/astaxie/beego"
 	"../constants"
+	"time"
+	"strconv"
 )
 
 type RepairForm struct {
@@ -38,6 +39,11 @@ type RepairForm struct {
 	//TODO, 这里要支持录视频和拍照片， 以及上传文件
 }
 
+type RepairOrder struct {
+	OrderDay string
+	OrderNumber int
+}
+
 func AddRepairForm(repairFormMap map[string]string) error {
 	mongoIPs := beego.AppConfig.String("mongodbIPs")
 	session, err := mgo.Dial(mongoIPs)
@@ -65,4 +71,45 @@ func AddRepairForm(repairFormMap map[string]string) error {
 		return err
 	}
 	return nil
+}
+
+//生成订单号
+func GenerateRepairFormOrder(orderNumberPrefix string) (string, error) {
+	year := time.Now().Year()
+	month := time.Now().Month()
+	monthNumber := int(month)
+	day := time.Now().Day()
+
+	yearString := strconv.Itoa(year)
+	monthString := strconv.Itoa(monthNumber)
+	dayString := strconv.Itoa(day)
+
+	prefix := yearString + monthString + dayString
+
+	mongoIPs := beego.AppConfig.String("mongodbIPs")
+	session, err := mgo.Dial(mongoIPs)
+	if err != nil {
+		return "", err
+	}
+	defer session.Close()
+
+	c := session.DB("ndc").C("repairorders")
+	_, err = c.Upsert(bson.M{"orderday": prefix}, bson.M{"$inc": bson.M{"ordernumber": 1}})
+	if err != nil {
+		return "", err
+	}
+
+	result := RepairOrder{}
+	err = c.Find(bson.M{"orderday": prefix}).One(result)
+	if err != nil {
+		return "", err
+	}
+	tempOrderNumber := strconv.Itoa(result.OrderNumber)
+	if len(tempOrderNumber) == 1 {
+		tempOrderNumber = "00" + tempOrderNumber
+	} else if len(tempOrderNumber) == 2 {
+		tempOrderNumber = "0" + tempOrderNumber
+	}
+	orderNumber := orderNumberPrefix + yearString + monthString + dayString + tempOrderNumber
+	return orderNumber, err
 }
