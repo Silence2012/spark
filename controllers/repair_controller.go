@@ -41,6 +41,12 @@ func (this *RepairController) SaveRepairForm() {
 	if orderErr != nil {
 		this.HandleError(result, orderErr)
 	}
+	//生成excel,文件名就是订单号，保存到本地
+
+	//发送邮件
+
+	//发送短信
+
 	this.Ctx.ResponseWriter.Write([]byte(orderNumber))
 
 }
