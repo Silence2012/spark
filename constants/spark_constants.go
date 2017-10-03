@@ -19,6 +19,7 @@ const (
 	BillAddress = "billAddress"
 	CompanyAddress = "companyAddress"
 	BugDetail = "bugDetail"
+	OrderId = "orderId"
 
 
 	EmailHost = "emailHost"
@@ -26,4 +27,8 @@ const (
 	EmailUser = "emailUser"
 	EmailPwd = "emailPwd"
 
+	//未处理new，正在处理handling，已经完成complete
+	OrderNew = "new"
+	OrderHandling = "handling"
+	OrderCompleted = "completed"
 )

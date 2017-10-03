@@ -26,11 +26,6 @@ func (this *RepairController) SaveRepairForm() {
 	//验证输入项
 	validErr := ValidRepairForm(body)
 	this.HandleError(result, validErr)
-	//持久化输入项
-	addErr := models.AddRepairForm(body)
-	if addErr != nil {
-		this.HandleError(result, addErr)
-	}
 
 	industry, _ := body["industry"]
 	//生成订单号前缀
@@ -41,6 +36,13 @@ func (this *RepairController) SaveRepairForm() {
 	if orderErr != nil {
 		this.HandleError(result, orderErr)
 	}
+	body[constants.OrderId] = orderNumber
+	//持久化输入项
+	addErr := models.AddRepairForm(body)
+	if addErr != nil {
+		this.HandleError(result, addErr)
+	}
+
 	//生成excel,文件名就是订单号，保存到本地
 
 	//发送邮件

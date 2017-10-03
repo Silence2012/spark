@@ -37,6 +37,10 @@ type RepairForm struct {
 	BugDetail string
 	//附件文档
 	//TODO, 这里要支持录视频和拍照片， 以及上传文件
+	//状态 未处理new，正在处理handling，已经完成complete，默认new
+	Status string
+	//订单号
+	OrderId string
 }
 
 type RepairOrder struct {
@@ -66,6 +70,8 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			repairFormMap[constants.BillAddress],
 			repairFormMap[constants.CompanyAddress],
 			repairFormMap[constants.BugDetail],
+			constants.OrderNew,
+			repairFormMap[constants.OrderId],
 		})
 	if err != nil {
 		return err
