@@ -83,6 +83,9 @@ func GenerateRepairFormOrder(orderNumberPrefix string) (string, error) {
 	yearString := strconv.Itoa(year)
 	monthString := strconv.Itoa(monthNumber)
 	dayString := strconv.Itoa(day)
+	if len(dayString) < 2 {
+		dayString = "0" + dayString
+	}
 
 	prefix := yearString + monthString + dayString
 
@@ -100,7 +103,7 @@ func GenerateRepairFormOrder(orderNumberPrefix string) (string, error) {
 	}
 
 	result := RepairOrder{}
-	err = c.Find(bson.M{"orderday": prefix}).One(result)
+	err = c.Find(bson.M{"orderday": prefix}).One(&result)
 	if err != nil {
 		return "", err
 	}
