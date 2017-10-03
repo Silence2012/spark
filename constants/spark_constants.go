@@ -20,4 +20,10 @@ const (
 	CompanyAddress = "companyAddress"
 	BugDetail = "bugDetail"
 
+
+	EmailHost = "emailHost"
+	EmailPort = "emailPort"
+	EmailUser = "emailUser"
+	EmailPwd = "emailPwd"
+
 )
