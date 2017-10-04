@@ -161,7 +161,8 @@ func validRepairForm(body map[string]string) ([]string, error)  {
 	//附件文档
 	//TODO, 这里要支持录视频和拍照片， 以及上传文件
 
-	result := []string{}
+	var result []string
+	result = make([]string, 11)
 	result[0] = company
 	result[1] = region
 	result[2] = name
