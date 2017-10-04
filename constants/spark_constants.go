@@ -31,4 +31,7 @@ const (
 	OrderNew = "new"
 	OrderHandling = "handling"
 	OrderCompleted = "completed"
+
+
+	ExcelDir = "excelDir"
 )

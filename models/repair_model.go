@@ -41,6 +41,8 @@ type RepairForm struct {
 	Status string
 	//订单号
 	OrderId string
+	//提交报修单时间
+	SubmitTime int64
 }
 
 type RepairOrder struct {
@@ -72,6 +74,7 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			repairFormMap[constants.BugDetail],
 			constants.OrderNew,
 			repairFormMap[constants.OrderId],
+			time.Now().Unix(),
 		})
 	if err != nil {
 		return err
