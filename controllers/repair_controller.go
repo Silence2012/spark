@@ -55,14 +55,16 @@ func (this *RepairController) SaveRepairForm() {
 
 }
 
+//按报修单id查询报修单状态
 func (this *RepairController) QueryStatusByOrderId()  {
 
 }
 
+//按报修单id查询报修单详情
 func (this *RepairController) QueryDetailByOrderId()  {
 
 }
-
+//获取所有报修单状态，未处理多少个，正在处理中多少个，已经完成多少个
 func (this *RepairController) GetRepairFormListStatus()  {
 
 	//db.getCollection('repairforms').aggregate({
@@ -73,15 +75,16 @@ func (this *RepairController) GetRepairFormListStatus()  {
 	//})
 
 }
-
+//按订单状态查询订单列表，未处理new，正在处理handling，已经完成complete
 func (this *RepairController) GetRepairFormListByOrderStatus()  {
 
 }
 
+//更新订单状态
 func (this *RepairController) UpdateRepairForm()  {
 
 }
-
+//查看已完成订单详细情况
 func (this *RepairController) QueryCompletedRepairFormDetailByOrderId()  {
 
 }
