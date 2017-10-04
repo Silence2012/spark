@@ -53,6 +53,30 @@ func (this *RepairController) SaveRepairForm() {
 
 }
 
+func (this *RepairController) QueryStatusByOrderId()  {
+
+}
+
+func (this *RepairController) QueryDetailByOrderId()  {
+
+}
+
+func (this *RepairController) GetRepairFormListStatus()  {
+
+}
+
+func (this *RepairController) GetRepairFormListByOrderStatus()  {
+
+}
+
+func (this *RepairController) UpdateRepairForm()  {
+
+}
+
+func (this *RepairController) QueryCompletedRepairFormDetailByOrderId()  {
+
+}
+
 func ValidRepairForm(body map[string]string) error  {
 
 	//公司名称
