@@ -8,10 +8,16 @@ import (
 	"errors"
 	"../models"
 	"../utils"
+
 )
 
 type RepairController struct {
 	beego.Controller
+}
+
+type RepairFormStatusList []struct {
+	ID    string `json:"_id"`
+	Count int    `json:"count"`
 }
 
 var titleArray = []string{"公司名称", "区域", "真实姓名", "手机号码", "邮箱", "行业", "产品序列号", "设备类型", "寄付帐单地址", "详细公司地址", "故障细节"}
@@ -73,6 +79,20 @@ func (this *RepairController) GetRepairFormListStatus()  {
 	//	"count": {"$sum": 1}
 	//	}
 	//})
+
+	result := make(map[string]interface{})
+	resp, getStatuListErr := models.GetStatusList()
+	this.HandleError(result, getStatuListErr)
+
+	//[map[_id:completed count:4] map[_id:new count:48] map[_id:handling count:3]]
+	for _, mapData := range resp {
+		id := mapData["_id"]
+		count := mapData["count"]
+		result[id.(string)] = count
+	}
+	response, marshalErr := json.Marshal(result)
+	this.HandleError(result, marshalErr)
+	this.Ctx.ResponseWriter.Write(response)
 
 }
 //按订单状态查询订单列表，未处理new，正在处理handling，已经完成complete

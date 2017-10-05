@@ -50,9 +50,17 @@ type RepairOrder struct {
 	OrderNumber int
 }
 
-func AddRepairForm(repairFormMap map[string]string) error {
+func InitMongodbSession() (*mgo.Session, error) {
 	mongoIPs := beego.AppConfig.String("mongodbIPs")
 	session, err := mgo.Dial(mongoIPs)
+	if err != nil {
+		return nil, err
+	}
+	return session, nil
+}
+
+func AddRepairForm(repairFormMap map[string]string) error {
+	session, err := InitMongodbSession()
 	if err != nil {
 		return err
 	}
@@ -98,8 +106,7 @@ func GenerateRepairFormOrder(orderNumberPrefix string) (string, error) {
 
 	prefix := yearString + monthString + dayString
 
-	mongoIPs := beego.AppConfig.String("mongodbIPs")
-	session, err := mgo.Dial(mongoIPs)
+	session, err := InitMongodbSession()
 	if err != nil {
 		return "", err
 	}
@@ -124,4 +131,26 @@ func GenerateRepairFormOrder(orderNumberPrefix string) (string, error) {
 	}
 	orderNumber := orderNumberPrefix + yearString + monthString + dayString + tempOrderNumber
 	return orderNumber, err
+}
+
+func GetStatusList() ([]bson.M, error) {
+	session, err := InitMongodbSession()
+	if err != nil {
+		return nil, err
+	}
+
+	c := session.DB("ndc").C("repairforms")
+	//db.getCollection('repairforms').aggregate({
+	//	"$group": {
+	//	"_id" : "$status",
+	//	"count": {"$sum": 1}
+	//	}
+	//})
+
+	pipe := c.Pipe([]bson.M{
+		{"$group": bson.M{"_id":"$status", "count": bson.M{"$sum": 1}}}})
+	resp := []bson.M{}
+	pipeErr := pipe.All(&resp)
+	beego.Info(resp)
+	return resp, pipeErr
 }
