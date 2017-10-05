@@ -18,5 +18,5 @@ func InitRepairRouter ()  {
 	//更新订单状态
 	beego.Router("/repairs/update", &controllers.RepairController{}, "put:UpdateRepairForm")
 	//查看已完成订单详细情况
-	beego.Router("/repairs/complete/detail/:orderid", &controllers.RepairController{}, "get:QueryCompletedRepairFormDetailByOrderId")
+	beego.Router("/repairs/complete/detail/:orderid", &controllers.RepairController{}, "get:QueryDetailByOrderId")
 }

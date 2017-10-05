@@ -154,3 +154,18 @@ func GetStatusList() ([]bson.M, error) {
 	beego.Info(resp)
 	return resp, pipeErr
 }
+
+func GetRepairOrderDetail(orderId string) (*RepairForm, error) {
+	session, err := InitMongodbSession()
+	if err != nil {
+		return nil, err
+	}
+
+	c := session.DB("ndc").C("repairforms")
+	result := RepairForm{}
+	err = c.Find(bson.M{"orderid": orderId}).One(&result)
+	if err != nil {
+		return nil, err
+	}
+	return &result, nil
+}

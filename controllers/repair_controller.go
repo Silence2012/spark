@@ -68,7 +68,20 @@ func (this *RepairController) QueryStatusByOrderId()  {
 
 //按报修单id查询报修单详情
 func (this *RepairController) QueryDetailByOrderId()  {
+	result := make(map[string]interface{})
 
+	paramMap := this.Ctx.Input.Params()
+	orderId, orderIdExisted := paramMap[":orderid"]
+	if !orderIdExisted {
+		err := errors.New("请输入订单号")
+		this.HandleError(result, err)
+	}
+	detail, detailErr := models.GetRepairOrderDetail(orderId)
+	this.HandleError(result, detailErr)
+
+	response, marshalErr := json.Marshal(detail)
+	this.HandleError(result, marshalErr)
+	this.Ctx.ResponseWriter.Write(response)
 }
 //获取所有报修单状态，未处理多少个，正在处理中多少个，已经完成多少个
 func (this *RepairController) GetRepairFormListStatus()  {
@@ -102,10 +115,6 @@ func (this *RepairController) GetRepairFormListByOrderStatus()  {
 
 //更新订单状态
 func (this *RepairController) UpdateRepairForm()  {
-
-}
-//查看已完成订单详细情况
-func (this *RepairController) QueryCompletedRepairFormDetailByOrderId()  {
 
 }
 
