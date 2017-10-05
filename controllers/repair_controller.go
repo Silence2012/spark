@@ -110,7 +110,21 @@ func (this *RepairController) GetRepairFormListStatus()  {
 }
 //按订单状态查询订单列表，未处理new，正在处理handling，已经完成complete
 func (this *RepairController) GetRepairFormListByOrderStatus()  {
+	result := make(map[string]interface{})
 
+	paramMap := this.Ctx.Input.Params()
+	orderStatus, orderStatusExisted := paramMap[":orderstatus"]
+	if !orderStatusExisted {
+		err := errors.New("请输入订单状态")
+		this.HandleError(result, err)
+	}
+
+	orderIds, getOrderStatusErr := models.GetRepairFormListByOrderStatus(orderStatus)
+	this.HandleError(result, getOrderStatusErr)
+
+	response, marshalErr := json.Marshal(orderIds)
+	this.HandleError(result, marshalErr)
+	this.Ctx.ResponseWriter.Write(response)
 }
 
 //更新订单状态

@@ -138,6 +138,7 @@ func GetStatusList() ([]bson.M, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer session.Close()
 
 	c := session.DB("ndc").C("repairforms")
 	//db.getCollection('repairforms').aggregate({
@@ -160,6 +161,7 @@ func GetRepairOrderDetail(orderId string) (*RepairForm, error) {
 	if err != nil {
 		return nil, err
 	}
+	defer session.Close()
 
 	c := session.DB("ndc").C("repairforms")
 	result := RepairForm{}
@@ -168,4 +170,21 @@ func GetRepairOrderDetail(orderId string) (*RepairForm, error) {
 		return nil, err
 	}
 	return &result, nil
+}
+
+func GetRepairFormListByOrderStatus(status string) ([]interface{}, error)  {
+	session, err := InitMongodbSession()
+	if err != nil {
+		return nil, err
+	}
+	defer session.Close()
+
+	c := session.DB("ndc").C("repairforms")
+	var result []interface{}
+	err = c.Find(bson.M{"status": status}).Select(bson.M{"orderid": 1}).All(&result)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
