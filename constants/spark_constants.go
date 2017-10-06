@@ -19,8 +19,15 @@ const (
 	BillAddress = "billAddress"
 	CompanyAddress = "companyAddress"
 	BugDetail = "bugDetail"
+
 	OrderId = "orderId"
 
+	EngineerName = "engineerName"
+	EngineerMobile = "engineerMobile"
+	HomeServiceTime = "homeServiceTime"
+	Notes = "notes"
+	FixCompleted = "fixcompleted"
+	SMSUser = "smsUser"
 
 	EmailHost = "emailHost"
 	EmailPort = "emailPort"

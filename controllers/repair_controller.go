@@ -63,7 +63,20 @@ func (this *RepairController) SaveRepairForm() {
 
 //按报修单id查询报修单状态
 func (this *RepairController) QueryStatusByOrderId()  {
+	result := make(map[string]interface{})
 
+	paramMap := this.Ctx.Input.Params()
+	orderId, orderIdExisted := paramMap[":orderid"]
+	if !orderIdExisted {
+		err := errors.New("请输入订单号")
+		this.HandleError(result, err)
+	}
+	status, getStatusErr := models.GetRepairOrderStatus(orderId)
+	this.HandleError(result, getStatusErr)
+
+	response, marshalErr := json.Marshal(status)
+	this.HandleError(result, marshalErr)
+	this.Ctx.ResponseWriter.Write(response)
 }
 
 //按报修单id查询报修单详情
@@ -129,6 +142,23 @@ func (this *RepairController) GetRepairFormListByOrderStatus()  {
 
 //更新订单状态
 func (this *RepairController) UpdateRepairForm()  {
+	result := make(map[string]interface{})
+
+	body := make(map[string]string)
+	bodyJson := this.Ctx.Input.RequestBody
+
+	err := json.Unmarshal(bodyJson, &body)
+	this.HandleError(result, err)
+
+	validErr := validEngineerOperations(body)
+	this.HandleError(result, validErr)
+
+	//更新订单状态
+
+	getOrderStatusErr := models.UpdateOrderLog(body)
+	this.HandleError(result, getOrderStatusErr)
+
+	this.Ctx.ResponseWriter.Write([]byte(constants.SUCCESS))
 
 }
 
@@ -314,6 +344,33 @@ func sendEmail(requestDataArray []string, excelPath string)  {
 	attachment := []string{excelPath}
 
 	utils.SendEmail(from, to, cc, subject, contentType, body, attachment...)
+}
+
+
+//处理报修单应该只有报修单号，工程师姓名和电话是必填项，其他可以不填
+func validEngineerOperations(body map[string]string) error  {
+
+	//报修单号
+	_, orderIdExised := body[constants.OrderId]
+	if !orderIdExised {
+		err := errors.New("订单号必填")
+		return err
+	}
+	//工程师姓名
+	_, engineerNameExisted := body[constants.EngineerName]
+	if !engineerNameExisted {
+		err := errors.New("工程师姓名必填")
+		return err
+	}
+
+	//工程师电话
+	_, engineerMobileExisted := body[constants.EngineerMobile]
+	if !engineerMobileExisted {
+		err := errors.New("工程师电话必填")
+		return err
+	}
+
+	return nil
 }
 
 
