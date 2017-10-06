@@ -43,6 +43,37 @@ type RepairForm struct {
 	OrderId string
 	//提交报修单时间
 	SubmitTime int64
+	//报修单状态
+	OrderLog         struct {
+		//报修， 只要客户提交了报修单，那么这里就算完成了
+		Report struct {
+			//报修时间
+			Time   int64 `json:"time"`
+			//报修状态
+			Complete bool `json:"complete"`
+		} `json:"report"`
+		//服务中心，这里暂时也这么处理：只要客户提交了报修单，那么这里就算完成了
+		Servicecenter struct {
+			Time   string `json:"time"`
+			Complete bool `json:"complete"`
+		} `json:"servicecenter"`
+		//工程师上门服务,里面包含了上门服务状态和维修完成状态
+		Engineer struct {
+			Name            string `json:"name"`
+			Mobile          string `json:"mobile"`
+			//是否已经上门服务
+			Homeservice     bool   `json:"homeservice"`
+			//上门服务时间
+			Homeservicetime int64 `json:"homeservicetime"`
+			Notes           string `json:"notes"`
+			//维修是否已完成
+			Complete        bool   `json:"complete"`
+			//是否发短信通知用户
+			Smsuser         bool   `json:"smsuser"`
+			//工程师更新状态时间
+			Time int64 `json:"time"`
+		} `json:"engineer"`
+	} `json:"orderLog"`
 }
 
 type RepairOrder struct {
@@ -83,6 +114,7 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			constants.OrderNew,
 			repairFormMap[constants.OrderId],
 			time.Now().Unix(),
+
 		})
 	if err != nil {
 		return err
