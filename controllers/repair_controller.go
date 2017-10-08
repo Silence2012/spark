@@ -148,7 +148,7 @@ func (this *RepairController) UpdateRepairForm()  {
 
 	body := make(map[string]string)
 	bodyJson := this.Ctx.Input.RequestBody
-
+	beego.Info(string(bodyJson))
 	err := json.Unmarshal(bodyJson, &body)
 	this.HandleError(result, err)
 
