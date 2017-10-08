@@ -16,6 +16,7 @@ const (
 	Serial = "serial"
 	FirstDeviceType = "firstDeviceType"
 	SecondDeviceType = "secondDeviceType"
+	ThirdDeviceType = "thirdDeviceType"
 	BillAddress = "billAddress"
 	CompanyAddress = "companyAddress"
 	BugDetail = "bugDetail"

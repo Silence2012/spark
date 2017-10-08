@@ -63,6 +63,7 @@ type RepairForm struct {
 	//设备类型（必选）
 	FirstDeviceType string
 	SecondDeviceType string
+	ThirdDeviceType string
 	//寄付帐单地址（必填）
 	BillAddress string
 	//详细公司地址（必填）
@@ -114,6 +115,7 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			repairFormMap[constants.Serial],
 			repairFormMap[constants.FirstDeviceType],
 			repairFormMap[constants.SecondDeviceType],
+			repairFormMap[constants.ThirdDeviceType],
 			repairFormMap[constants.BillAddress],
 			repairFormMap[constants.CompanyAddress],
 			repairFormMap[constants.BugDetail],
