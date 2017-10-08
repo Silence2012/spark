@@ -9,6 +9,7 @@ import (
 	"../models"
 	"../utils"
 
+	"strings"
 )
 
 type RepairController struct {
@@ -318,8 +319,9 @@ func sendEmail(requestDataArray []string, excelPath string)  {
 	//from string, to []string, cc string, subject string, contentType string, body string, attachments ...string
 
 	from := beego.AppConfig.String(constants.EmailUser)
-	//TODO 还没拿到发送的邮箱，暂时写个测试数据
-	to := []string{"joey8656@163.com"}
+	//发送邮件给相关人员，邮箱配置在配置文件里以逗号隔开
+	toStringWithComma := beego.AppConfig.String(constants.EmailList)
+	to := strings.Split(toStringWithComma, ",")
 	cc := ""
 	//TODO 邮件标题,这个也需要最终定了以后替换
 	subject := "新的报修单"

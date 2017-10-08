@@ -34,6 +34,7 @@ const (
 	EmailPort = "emailPort"
 	EmailUser = "emailUser"
 	EmailPwd = "emailPwd"
+	EmailList = "emailList"
 
 	//未处理new，正在处理handling，已经完成complete
 	OrderNew = "new"
