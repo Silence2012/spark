@@ -28,6 +28,7 @@ const (
 	HomeServiceTime = "homeServiceTime"
 	Notes = "notes"
 	FixCompleted = "fixcompleted"
+	FixCompletedTime = "fixcompletedtime"
 	SMSUser = "smsUser"
 
 	EmailHost = "emailHost"

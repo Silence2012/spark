@@ -79,6 +79,8 @@ type RepairForm struct {
 	OrderId string
 	//提交报修单时间
 	SubmitTime int64
+	//订单维修完成时间
+	FixCompletedTime int64
 	//报修单状态
 	OrderLog *OrderLog
 }
@@ -122,6 +124,7 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			constants.OrderNew,
 			repairFormMap[constants.OrderId],
 			time.Now().Unix(),
+			0,
 			&OrderLog{
 				&Report{time.Now().Unix(), true},
 			    &Servicecenter{time.Now().Unix(), true},
@@ -255,12 +258,12 @@ func UpdateOrderLog(body map[string]string) error {
 	orderId := body[constants.OrderId]
 	engineerName := body[constants.EngineerName]
 	engineerMobile := body[constants.EngineerMobile]
-	//这个需要编程int64
+	//这个需要转换为int64
 	homeServiceTime := body[constants.HomeServiceTime]
 	notes := body[constants.Notes]
-	//这个需要编程bool
+	//这个需要转换为bool
 	fixCompleted := body[constants.FixCompleted]
-	//这个需要编程bool
+	//这个需要转换为bool
 	smsUser := body[constants.SMSUser]
 
 	var homeServiceTimeInt int64
@@ -271,6 +274,9 @@ func UpdateOrderLog(body map[string]string) error {
 
 	fixCompletedBool, _ = strconv.ParseBool(fixCompleted)
 	smsUserBool, _ = strconv.ParseBool(smsUser)
+
+	var fixCompletedTime int64
+	fixCompletedTime = 0
 
 	if homeServiceTime == "" {
 		homeServiceTimeInt = 0
@@ -296,6 +302,7 @@ func UpdateOrderLog(body map[string]string) error {
 	var handleStatus string
 	if fixCompletedBool {
 		handleStatus = constants.OrderCompleted
+		fixCompletedTime = time.Now().Unix()
 	}else {
 		handleStatus = constants.OrderHandling
 	}
@@ -317,7 +324,7 @@ func UpdateOrderLog(body map[string]string) error {
 														"orderlog.engineer.complete": fixCompletedBool,
 														"orderlog.engineer.smsuser": smsUserBool,
 														"orderlog.engineer.time": time.Now().Unix(),
-
+														"fixcompletedtime": fixCompletedTime,
 														"status": handleStatus,
 														}})
 
