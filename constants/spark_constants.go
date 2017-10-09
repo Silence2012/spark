@@ -30,6 +30,7 @@ const (
 	FixCompleted = "fixcompleted"
 	FixCompletedTime = "fixcompletedtime"
 	SMSUser = "smsUser"
+	RepairTime = "repairTime"
 
 	EmailHost = "emailHost"
 	EmailPort = "emailPort"

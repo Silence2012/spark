@@ -30,6 +30,7 @@ type Engineer struct {
 	Homeservice     bool
 	//上门服务时间
 	Homeservicetime int64
+
 	Notes           string
 	//维修是否已完成
 	Complete        bool
@@ -37,6 +38,8 @@ type Engineer struct {
 	Smsuser         bool
 	//工程师更新状态时间, 如果时间不为零，说明工程师更新过状态，否则认为工程师没进行任何操作
 	Time int64
+	//维修时间
+	RepairTime int64
 }
 
 type OrderLog struct {
@@ -265,6 +268,8 @@ func UpdateOrderLog(body map[string]string) error {
 	fixCompleted := body[constants.FixCompleted]
 	//这个需要转换为bool
 	smsUser := body[constants.SMSUser]
+	//维修时间
+	repairTime := body[constants.RepairTime]
 
 	var homeServiceTimeInt int64
 	var fixCompletedBool bool
@@ -278,11 +283,14 @@ func UpdateOrderLog(body map[string]string) error {
 	var fixCompletedTime int64
 	fixCompletedTime = 0
 
+	var repairTimeInt int64
+	repairTimeInt = 0
+
 	if homeServiceTime == "" {
 		homeServiceTimeInt = 0
 	} else {
 		//转化所需模板
-		timeLayout := "2006-01-02T15:04"
+		timeLayout := "2006-01-02"
 		//获取时区
 		loc, _ := time.LoadLocation("Local")
 		theTime, convertErr := time.ParseInLocation(timeLayout, homeServiceTime, loc)
@@ -291,6 +299,20 @@ func UpdateOrderLog(body map[string]string) error {
 		}
 		//转化为时间戳 类型是int64
 		homeServiceTimeInt = theTime.Unix()
+	}
+	if repairTime == "" {
+		repairTimeInt = 0
+	} else {
+		//转化所需模板
+		timeLayout := "2006-01-02"
+		//获取时区
+		loc, _ := time.LoadLocation("Local")
+		theTime, convertErr := time.ParseInLocation(timeLayout, repairTime, loc)
+		if convertErr != nil {
+			repairTimeInt = 0
+		}
+		//转化为时间戳 类型是int64
+		repairTimeInt = theTime.Unix()
 	}
 
 	if homeServiceTimeInt == 0 {
@@ -324,6 +346,7 @@ func UpdateOrderLog(body map[string]string) error {
 														"orderlog.engineer.complete": fixCompletedBool,
 														"orderlog.engineer.smsuser": smsUserBool,
 														"orderlog.engineer.time": time.Now().Unix(),
+														"orderlog.engineer.repairtime": repairTimeInt,
 														"fixcompletedtime": fixCompletedTime,
 														"status": handleStatus,
 														}})
