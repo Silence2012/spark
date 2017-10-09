@@ -56,7 +56,7 @@ func (this *RepairController) SaveRepairForm() {
 	//生成excel,文件名就是订单号，保存到本地
 	excelPath := generateExcel(requestDataArray, orderNumber)
 	//发送邮件
-	sendEmail(requestDataArray, excelPath)
+	sendEmail(requestDataArray, excelPath,orderNumber)
 	//发送短信
 
 	this.Ctx.ResponseWriter.Write([]byte(orderNumber))
@@ -315,7 +315,7 @@ func generateExcel(body []string, orderId string) string {
 	return excelPath
 }
 
-func sendEmail(requestDataArray []string, excelPath string)  {
+func sendEmail(requestDataArray []string, excelPath string, orderNumber string )  {
 	//from string, to []string, cc string, subject string, contentType string, body string, attachments ...string
 
 	from := beego.AppConfig.String(constants.EmailUser)
@@ -324,7 +324,7 @@ func sendEmail(requestDataArray []string, excelPath string)  {
 	to := strings.Split(toStringWithComma, ",")
 	cc := ""
 	//TODO 邮件标题,这个也需要最终定了以后替换
-	subject := "新的报修单"
+	subject := "新的报修单(来自微信、网页端的测试通知邮件）【测试】"+ "订单号： "+orderNumber
 	contentType := "text/html"
 
 	tbody := ""
