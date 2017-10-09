@@ -282,7 +282,7 @@ func UpdateOrderLog(body map[string]string) error {
 		homeServiceTimeInt = 0
 	} else {
 		//转化所需模板
-		timeLayout := "2017-10-06 15:04:05"
+		timeLayout := "2006-01-02T15:04"
 		//获取时区
 		loc, _ := time.LoadLocation("Local")
 		theTime, convertErr := time.ParseInLocation(timeLayout, homeServiceTime, loc)
