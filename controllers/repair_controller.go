@@ -37,9 +37,11 @@ func (this *RepairController) SaveRepairForm() {
 	requestDataArray, validErr := validRepairForm(body)
 	this.HandleError(result, validErr)
 
-	industry, _ := body["industry"]
+	//industry, _ := body["industry"]
+	firstDeviceType, _ := body["firstDeviceType"]
+
 	//生成订单号前缀
-	orderPrefix := GenerateOrderPrefix(industry)
+	orderPrefix := GenerateOrderPrefix(firstDeviceType)
 
 	//生成订单号
 	orderNumber, orderErr := models.GenerateRepairFormOrder(orderPrefix)
@@ -257,7 +259,7 @@ func validRepairForm(body map[string]string) ([]string, error)  {
 	return result, nil
 }
 
-func GenerateOrderPrefix(industry string) string {
+func GenerateOrderPrefix( catalog string) string {
 	//化工品和药品	订单生成首字母T
 	//涂布复合	订单生成首字母P
 	//薄膜和片材挤出	订单生成首字母P
@@ -270,7 +272,13 @@ func GenerateOrderPrefix(industry string) string {
 	//烟草加工	订单生成首字母T
 	//电线，电缆和光纤	订单生成首字母C
 	//其他	订单生成首字母O
+//new needs
+//	冶金工业系列产品——M；
+//	系统选项——S；
+//	红外传感器系列产品——I；
+//	Beta LaserMike和Zmike 系列产品——C；
 
+/*
 	switch industry {
 	case "化工品和药品":
 		return "T"
@@ -293,6 +301,19 @@ func GenerateOrderPrefix(industry string) string {
 	case "烟草加工":
 		return "T"
 	case "电线，电缆和光纤":
+		return "C"
+	default:
+		return "O"
+	}
+	*/
+	switch catalog {
+	case "冶金工业系列产品":
+		return "M"
+	case "系统选项":
+		return "S"
+	case "红外传感器系列产品":
+                return "I"
+	case "Beta LaserMike和Zmike 系列产品":
 		return "C"
 	default:
 		return "O"
