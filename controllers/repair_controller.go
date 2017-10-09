@@ -324,7 +324,7 @@ func sendEmail(requestDataArray []string, excelPath string, orderNumber string )
 	to := strings.Split(toStringWithComma, ",")
 	cc := ""
 	//TODO 邮件标题,这个也需要最终定了以后替换
-	subject := "新的报修单(来自微信、网页端的测试通知邮件）【测试】"+ "订单号： "+orderNumber
+	subject := "新的报修单(来自微信、网页端的测试通知邮件）【测试】" + "订单号： " + orderNumber
 	contentType := "text/html"
 
 	tbody := ""
