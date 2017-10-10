@@ -214,12 +214,12 @@ func validRepairForm(body map[string]string) ([]string, error)  {
 		err := errors.New("设备类型必填")
 		return nil, err
 	}
-	//secondDeviceType, secondDeviceTypeExisted := body[constants.SecondDeviceType]
-	//if !secondDeviceTypeExisted {
-	//	err := errors.New("设备类型必填")
-	//	return nil, err
-	//}
-	//thirdDeviceType, _ := body[constants.ThirdDeviceType]
+	secondDeviceType, secondDeviceTypeExisted := body[constants.SecondDeviceType]
+	if !secondDeviceTypeExisted {
+		err := errors.New("设备类型必填")
+		return nil, err
+	}
+	thirdDeviceType, _ := body[constants.ThirdDeviceType]
 
 	//寄付帐单地址（必填）
 	billAddress, billAddressExisted := body[constants.BillAddress]
@@ -252,7 +252,7 @@ func validRepairForm(body map[string]string) ([]string, error)  {
 	result[4] = email
 	result[5] = ""
 	result[6] = serial
-	result[7] = firstDeviceType
+	result[7] = firstDeviceType + "--" + secondDeviceType + "--" + thirdDeviceType
 	result[8] = billAddress
 	result[9] = companyAddress
 	result[10] = bugDetail
