@@ -216,7 +216,7 @@ func GetRepairOrderStatus(orderId string) (interface{}, error) {
 	c := session.DB("ndc").C("repairforms")
 
 	var result interface{}
-	err = c.Find(bson.M{"orderid": orderId}).Select(bson.M{"orderlog": 1}).One(&result)
+	err = c.Find(bson.M{"orderid": orderId}).Select(bson.M{"orderlog": 1,"status":1,"fixcompletedtime":1}).One(&result)
 	if err != nil {
 		return nil, err
 	}
