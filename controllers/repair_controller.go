@@ -196,12 +196,12 @@ func validRepairForm(body map[string]string) ([]string, error)  {
 		err := errors.New("邮箱必填")
 		return nil, err
 	}
-	//行业（必选）
-	industry, industryExisted := body[constants.Industry]
-	if !industryExisted {
-		err := errors.New("行业必填")
-		return nil, err
-	}
+	////行业（必选）
+	//industry, industryExisted := body[constants.Industry]
+	//if !industryExisted {
+	//	err := errors.New("行业必填")
+	//	return nil, err
+	//}
 	//产品序列号（必填）
 	serial, serialExisted := body[constants.Serial]
 	if !serialExisted {
@@ -214,12 +214,12 @@ func validRepairForm(body map[string]string) ([]string, error)  {
 		err := errors.New("设备类型必填")
 		return nil, err
 	}
-	secondDeviceType, secondDeviceTypeExisted := body[constants.SecondDeviceType]
-	if !secondDeviceTypeExisted {
-		err := errors.New("设备类型必填")
-		return nil, err
-	}
-	thirdDeviceType, _ := body[constants.ThirdDeviceType]
+	//secondDeviceType, secondDeviceTypeExisted := body[constants.SecondDeviceType]
+	//if !secondDeviceTypeExisted {
+	//	err := errors.New("设备类型必填")
+	//	return nil, err
+	//}
+	//thirdDeviceType, _ := body[constants.ThirdDeviceType]
 
 	//寄付帐单地址（必填）
 	billAddress, billAddressExisted := body[constants.BillAddress]
@@ -250,9 +250,9 @@ func validRepairForm(body map[string]string) ([]string, error)  {
 	result[2] = name
 	result[3] = mobile
 	result[4] = email
-	result[5] = industry
+	result[5] = ""
 	result[6] = serial
-	result[7] = firstDeviceType + secondDeviceType + thirdDeviceType
+	result[7] = firstDeviceType
 	result[8] = billAddress
 	result[9] = companyAddress
 	result[10] = bugDetail
