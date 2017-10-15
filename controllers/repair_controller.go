@@ -306,9 +306,9 @@ func GenerateOrderPrefix( catalog string) string {
 	default:
 		return "O"
 	}
-	*/
+
 	switch catalog {
-	case "冶金工业系列产品（Accuray, IRM）":
+	case "冶金工业系列产品（Accuray, IRM":
 		return "M"
 	case "系统选项":
 		return "S"
@@ -317,6 +317,20 @@ func GenerateOrderPrefix( catalog string) string {
 	case "Beta LaserMike和Zmike 系列产品":
 		return "C"
 	default:
+		return "O"
+	}
+	*/
+	if  strings.HasPrefix(catalog,"冶金工业系列产品") {
+		return "M"
+	} else if strings.HasPrefix(catalog,"系统选项") {
+
+		return "S"
+	} else if strings.HasPrefix(catalog,"红外传感器系列产品") {
+
+		return "I"
+	} else if strings.HasPrefix(catalog,"Beta LaserMike和Zmike") {
+		return "C"
+	} else {
 		return "O"
 	}
 }
