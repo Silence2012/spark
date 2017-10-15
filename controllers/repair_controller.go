@@ -308,7 +308,7 @@ func GenerateOrderPrefix( catalog string) string {
 	}
 
 	switch catalog {
-	case "冶金工业系列产品（Accuray, IRM":
+	case "冶金工业系列产品（Accuray, IRM)":
 		return "M"
 	case "系统选项":
 		return "S"
