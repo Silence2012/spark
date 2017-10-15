@@ -60,7 +60,8 @@ func (this *RepairController) SaveRepairForm() {
 	//发送邮件
 	sendEmail(requestDataArray, excelPath,orderNumber)
 	//发送短信
-        //sendSms(orderNumber)
+	//clientNum := body[constants.Mobile]
+        //sendSms(orderNumber, clientNum)
 	this.Ctx.ResponseWriter.Write([]byte(orderNumber))
 
 }
@@ -372,12 +373,12 @@ func sendEmail(requestDataArray []string, excelPath string, orderNumber string )
 	utils.SendEmail(from, to, cc, subject, contentType, body, attachment...)
 }
 
-func sendSms(orderNumber string) {
-        phoneNum :="13918243868"
+func sendSms(orderNumber string,clientNum string) {
+        phoneNum := clientNum
 	if strings.HasPrefix(orderNumber, "C") {
-		phoneNum += ",13916606238"
+		phoneNum += ",13916606238,13918243868"
 	} else {
-		phoneNum += ",13917092518"
+		phoneNum += ",13917092518,13918243868"
 
         }
 	utils.SendSms(constants.SMSServer,phoneNum,orderNumber)
