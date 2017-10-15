@@ -60,7 +60,7 @@ func (this *RepairController) SaveRepairForm() {
 	//发送邮件
 	sendEmail(requestDataArray, excelPath,orderNumber)
 	//发送短信
-
+        //sendSms(orderNumber)
 	this.Ctx.ResponseWriter.Write([]byte(orderNumber))
 
 }
@@ -372,7 +372,16 @@ func sendEmail(requestDataArray []string, excelPath string, orderNumber string )
 	utils.SendEmail(from, to, cc, subject, contentType, body, attachment...)
 }
 
+func sendSms(orderNumber string) {
+        phoneNum :="13918243868"
+	if strings.HasPrefix(orderNumber, "C") {
+		phoneNum += ",13916606238"
+	} else {
+		phoneNum += ",13917092518"
 
+        }
+	utils.SendSms(constants.SMSServer,phoneNum,orderNumber)
+}
 //处理报修单应该只有报修单号，工程师姓名和电话是必填项，其他可以不填
 func validEngineerOperations(body map[string]string) error  {
 
