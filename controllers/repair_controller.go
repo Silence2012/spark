@@ -32,7 +32,7 @@ func (this *RepairController) DeleteOrderId() {
 	orderid := body["orderid"]
 	delErr := models.RemoveCollection(orderid)
 	if delErr != nil {
-		this.HandleError(result, addErr)
+		this.HandleError(result, delErr)
 	}
 }
 

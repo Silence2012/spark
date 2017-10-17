@@ -147,10 +147,11 @@ func RemoveCollection(orderId string) error {
 	}
 	defer session.Close()
 	c := session.DB("ndc").C("repairforms")
-	_, err = collection.RemoveAll(bson.M{"orderid": orderID})
+	_, err = c.RemoveAll(bson.M{"orderid": orderId})
 	if err != nil {
 		return err
 	}
+	return nil
 }
 
 //生成订单号
