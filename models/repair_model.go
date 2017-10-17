@@ -263,7 +263,7 @@ func GetRepairFormListByOrderStatus(status string) ([]interface{}, error)  {
 
 	c := session.DB("ndc").C("repairforms")
 	var result []interface{}
-	err = c.Find(bson.M{"status": status}).Select(bson.M{"orderid": 1}).All(&result)
+	err = c.Find(bson.M{"status": status}).Select(bson.M{"orderid": 1}).Sort("-submittime").All(&result)
 	if err != nil {
 		return nil, err
 	}
