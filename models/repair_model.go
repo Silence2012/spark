@@ -140,6 +140,19 @@ func AddRepairForm(repairFormMap map[string]string) error {
 	return nil
 }
 
+func RemoveCollection(orderId string) error {
+	session, err := InitMongodbSession()
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	c := session.DB("ndc").C("repairforms")
+	_, err = collection.RemoveAll(bson.M{"orderid": orderID})
+	if err != nil {
+		return err
+	}
+}
+
 //生成订单号
 func GenerateRepairFormOrder(orderNumberPrefix string) (string, error) {
 	year := time.Now().Year()
