@@ -45,7 +45,7 @@ type Engineer struct {
 type OrderLog struct {
 	Report *Report
 	Servicecenter *Servicecenter
-	Engineer *Engineer
+	Engineers[] *Engineer
 }
 
 type RepairForm struct {
@@ -110,6 +110,7 @@ func AddRepairForm(repairFormMap map[string]string) error {
 	defer session.Close()
 
 	c := session.DB("ndc").C("repairforms")
+
 	err = c.Insert(&RepairForm{
 			repairFormMap[constants.Company],
 			repairFormMap[constants.Region],
@@ -131,7 +132,7 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			&OrderLog{
 				&Report{time.Now().Unix(), true},
 			    &Servicecenter{time.Now().Unix(), true},
-			    &Engineer{},
+				nil,
 			},
 		})
 	if err != nil {
@@ -351,18 +352,20 @@ func UpdateOrderLog(body map[string]string) error {
 
 	c := session.DB("ndc").C("repairforms")
 
-	updateErr := c.Update(bson.M{"orderid": orderId}, bson.M{"$set": bson.M{
-														"orderlog.engineer.name": engineerName,
-														"orderlog.engineer.mobile": engineerMobile,
-														"orderlog.engineer.homeservice": homeService,
-														"orderlog.engineer.homeservicetime": homeServiceTimeInt,
-														"orderlog.engineer.notes": notes,
-														"orderlog.engineer.complete": fixCompletedBool,
-														"orderlog.engineer.smsuser": smsUserBool,
-														"orderlog.engineer.time": time.Now().Unix(),
-														"orderlog.engineer.repairtime": repairTimeInt,
-														"fixcompletedtime": fixCompletedTime,
-														"status": handleStatus,
+	updateErr := c.Update(bson.M{"orderid": orderId}, bson.M{"$push": bson.M{
+													    "orderlog.engineers": bson.M{
+															"name": engineerName,
+															"mobile": engineerMobile,
+															"homeservice": homeService,
+															"homeservicetime": homeServiceTimeInt,
+															"notes": notes,
+															"complete": fixCompletedBool,
+															"smsuser": smsUserBool,
+															"time": time.Now().Unix(),
+															"repairtime": repairTimeInt,
+															"fixcompletedtime": fixCompletedTime,
+															"status": handleStatus,
+														},
 														}})
 
 	return updateErr
