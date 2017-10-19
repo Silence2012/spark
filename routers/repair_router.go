@@ -23,4 +23,6 @@ func InitRepairRouter ()  {
 	beego.Router("/repairs/top", &controllers.RepairController{}, "post:TopOrder")
 	//通过微信API获取用户信息
 	beego.Router("/repairs/account", &controllers.RepairController{}, "get:GetAccountInfo")
+	//根据订单id删除订单
+	beego.Router("/repairs/delete", &controllers.RepairController{}, "post:DeleteOrderId")
 }

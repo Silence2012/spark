@@ -23,6 +23,7 @@ type RepairFormStatusList []struct {
 }
 
 var titleArray = []string{"公司名称", "区域", "真实姓名", "手机号码", "邮箱", "行业", "产品序列号", "设备类型", "寄付帐单地址", "详细公司地址", "故障细节"}
+
 func (this *RepairController) DeleteOrderId() {
 	result := make(map[string]interface{})
 	body := make(map[string]string)	
