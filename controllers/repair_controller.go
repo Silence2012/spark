@@ -215,7 +215,7 @@ func (this *RepairController) TopOrder()  {
 func (this *RepairController) GetAccountInfo()  {
 	result := make(map[string]interface{})
 
-	var URL = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=hDftRWKxW-Oxf0q5OBnzlGEK2SrCL3uJ73GQuggJ4XZS1ap3-n6-D3FCcKgXQ0nGjaDbu8uj0N3gnCrButAlmVO9vXihHe8ZSDmSYWxKX9DAZ2Z4Xbwrb5Kn7_h6bMovZFLcAHAIOU&openid=OPENID&lang=zh_CN"
+	var URL = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=t8j6Nyxt8sRARNCkMUMm5aaHVNF8LRmhpz8N9owqDYuUopdCpaIS_mEd7Ys2LEgHH1rVoGOR9SmYO5jUVL-aWnZwbgiwhcYxnUXt8yywQIzTdHzwDlVzeBNmfrOAM7PbGHJeAHAQRT&openid=OPENID&lang=zh_CN"
 	beego.Info("get account info.....")
 	beego.Info(URL)
 	transport := &http.Transport{DisableKeepAlives: false, MaxIdleConnsPerHost: 500}
