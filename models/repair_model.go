@@ -363,11 +363,18 @@ func UpdateOrderLog(body map[string]string) error {
 															"smsuser": smsUserBool,
 															"time": time.Now().Unix(),
 															"repairtime": repairTimeInt,
-															"fixcompletedtime": fixCompletedTime,
-															"status": handleStatus,
 														},
 														}})
+	if updateErr != nil {
+		return updateErr
+	}
 
-	return updateErr
+	updateFixCompleteErr := c.Update(bson.M{"orderid": orderId}, bson.M{"$set": bson.M{
+		"fixcompletedtime": fixCompletedTime,
+		"status": handleStatus,
+		},
+	})
+
+	return updateFixCompleteErr
 
 }
