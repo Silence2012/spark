@@ -40,6 +40,8 @@ type Engineer struct {
 	Time int64
 	//维修时间
 	RepairTime int64
+	//选项
+	SelectedOption string
 }
 
 type OrderLog struct {
@@ -90,6 +92,7 @@ type RepairForm struct {
 	Top bool
 	//置顶时间
 	TopTime int64
+
 
 }
 
@@ -292,6 +295,8 @@ func UpdateOrderLog(body map[string]string) error {
 	smsUser := body[constants.SMSUser]
 	//维修时间
 	repairTime := body[constants.RepairTime]
+	//选项
+	selectOption := body[constants.SelectedOption]
 
 	var homeServiceTimeInt int64
 	var fixCompletedBool bool
@@ -308,7 +313,7 @@ func UpdateOrderLog(body map[string]string) error {
 	var repairTimeInt int64
 	repairTimeInt = 0
 
-	if homeServiceTime == "" {
+	if homeServiceTime == "" || homeServiceTime == "0"{
 		homeServiceTimeInt = 0
 	} else {
 		//转化所需模板
@@ -370,6 +375,7 @@ func UpdateOrderLog(body map[string]string) error {
 															"smsuser": smsUserBool,
 															"time": time.Now().Unix(),
 															"repairtime": repairTimeInt,
+															"selectedoption": selectOption,
 														},
 														}})
 	if updateErr != nil {

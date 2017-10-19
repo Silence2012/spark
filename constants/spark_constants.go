@@ -33,6 +33,7 @@ const (
 	FixCompletedTime = "fixcompletedtime"
 	SMSUser = "smsUser"
 	RepairTime = "repairTime"
+	SelectedOption = "selectedOption"
 	SMSServer = "http://127.0.0.1:8000/sendSms"
 
 	EmailHost = "emailHost"
