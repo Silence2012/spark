@@ -19,4 +19,6 @@ func InitRepairRouter ()  {
 	beego.Router("/repairs/update", &controllers.RepairController{}, "post:UpdateRepairForm")
 	//查看已完成订单详细情况
 	beego.Router("/repairs/complete/detail/:orderid", &controllers.RepairController{}, "get:QueryDetailByOrderId")
+	//订单置顶
+	beego.Router("/repairs/top", &controllers.RepairController{}, "post:TopOrder")
 }

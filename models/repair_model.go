@@ -86,6 +86,11 @@ type RepairForm struct {
 	FixCompletedTime int64
 	//报修单状态
 	OrderLog *OrderLog
+	//是否置顶，默认false
+	Top bool
+	//置顶时间
+	TopTime int64
+
 }
 
 type RepairOrder struct {
@@ -134,6 +139,8 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			    &Servicecenter{time.Now().Unix(), true},
 				nil,
 			},
+			false,
+			0,
 		})
 	if err != nil {
 		return err
@@ -264,7 +271,7 @@ func GetRepairFormListByOrderStatus(status string) ([]interface{}, error)  {
 
 	c := session.DB("ndc").C("repairforms")
 	var result []interface{}
-	err = c.Find(bson.M{"status": status}).Select(bson.M{"orderid": 1}).Sort("-submittime").All(&result)
+	err = c.Find(bson.M{"status": status}).Select(bson.M{"orderid": 1}).Sort("-toptime", "-submittime").All(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -376,5 +383,35 @@ func UpdateOrderLog(body map[string]string) error {
 	})
 
 	return updateFixCompleteErr
+
+}
+
+
+//orderId: 订单号，
+//top： true置顶 false取消置顶
+func TopOrderById(orderId string, top bool) error {
+
+	session, err := InitMongodbSession()
+	if err != nil {
+		return  err
+	}
+	defer session.Close()
+
+	c := session.DB("ndc").C("repairforms")
+
+	var topTime int64 = 0
+	if top {
+		topTime = time.Now().Unix()
+	}
+
+	updateErr := c.Update(bson.M{"orderid": orderId}, bson.M{"$set": bson.M{
+		"top": top,
+		"toptime": topTime,
+	}})
+	if updateErr != nil {
+		return updateErr
+	}
+
+	return nil
 
 }

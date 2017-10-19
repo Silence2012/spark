@@ -180,6 +180,49 @@ func (this *RepairController) UpdateRepairForm()  {
 
 }
 
+//置顶订单
+func (this *RepairController) TopOrder()  {
+	result := make(map[string]interface{})
+
+	body := make(map[string]string)
+	bodyJson := this.Ctx.Input.RequestBody
+	beego.Info(string(bodyJson))
+	err := json.Unmarshal(bodyJson, &body)
+	this.HandleError(result, err)
+
+	orderIdExisted, validErr := validTopOrder(body)
+	this.HandleError(result, validErr)
+	if !orderIdExisted {
+		err := errors.New("请输入订单号")
+		this.HandleError(result, err)
+	}
+	orderId := body[constants.OrderId]
+	top := body[constants.Top]
+	var toTop bool = false
+	if top == "true" {
+		toTop = true
+	}
+	//按orderid，更改top和toptime字段
+	topErr := models.TopOrderById(orderId, toTop)
+	this.HandleError(result, topErr)
+
+	this.Ctx.ResponseWriter.Write([]byte(constants.SUCCESS))
+}
+
+func validTopOrder(body map[string]string) (bool, error) {
+	//orderId
+	orderId, orderIdExised := body[constants.OrderId]
+
+	if !orderIdExised || orderId == "" {
+		err := errors.New("请输入订单号")
+		return false, err
+	}
+
+
+	return true, nil
+
+}
+
 
 func validRepairForm(body map[string]string) ([]string, error)  {
 
