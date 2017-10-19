@@ -8,8 +8,9 @@ import (
 	"errors"
 	"../models"
 	"../utils"
-
+	"net/http"
 	"strings"
+	"io/ioutil"
 )
 
 type RepairController struct {
@@ -208,6 +209,38 @@ func (this *RepairController) TopOrder()  {
 
 	this.Ctx.ResponseWriter.Write([]byte(constants.SUCCESS))
 }
+
+
+//置顶订单
+func (this *RepairController) GetAccountInfo()  {
+	result := make(map[string]interface{})
+
+	var URL = "https://api.weixin.qq.com/cgi-bin/user/info?access_token=hDftRWKxW-Oxf0q5OBnzlGEK2SrCL3uJ73GQuggJ4XZS1ap3-n6-D3FCcKgXQ0nGjaDbu8uj0N3gnCrButAlmVO9vXihHe8ZSDmSYWxKX9DAZ2Z4Xbwrb5Kn7_h6bMovZFLcAHAIOU&openid=OPENID&lang=zh_CN"
+	beego.Info("get account info.....")
+	beego.Info(URL)
+	transport := &http.Transport{DisableKeepAlives: false, MaxIdleConnsPerHost: 500}
+
+	req, _ := http.NewRequest("GET", URL, nil)
+
+	req.Close = false
+
+	res, err := transport.RoundTrip(req)
+	if err != nil {
+		this.HandleError(result, err)
+	}
+	body, _ := ioutil.ReadAll(res.Body)
+
+	if transport != nil {
+		transport.CloseIdleConnections()
+	}
+
+	if res != nil && res.Body != nil {
+		res.Body.Close()
+	}
+
+	this.Ctx.ResponseWriter.Write(body)
+}
+
 
 func validTopOrder(body map[string]string) (bool, error) {
 	//orderId
