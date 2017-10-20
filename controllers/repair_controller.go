@@ -22,7 +22,7 @@ type RepairFormStatusList []struct {
 	Count int    `json:"count"`
 }
 
-var titleArray = []string{"公司名称", "区域", "真实姓名", "手机号码", "邮箱", "行业", "产品序列号", "设备类型", "寄付帐单地址", "详细公司地址", "故障细节"}
+var titleArray = []string{"公司名称", "真实姓名", "手机号码", "邮箱", "产品序列号", "设备类型", "寄付帐单地址", "详细公司地址", "故障细节"}
 
 func (this *RepairController) DeleteOrderId() {
 	result := make(map[string]interface{})
@@ -266,8 +266,6 @@ func validRepairForm(body map[string]string) ([]string, error)  {
 		err := errors.New("公司名称必填")
 		return nil, err
 	}
-	//区域，非必填
-	region, _ := body[constants.Region]
 
 	//真实姓名（必填）
 	name, nameExisted := body[constants.Name]
@@ -287,12 +285,7 @@ func validRepairForm(body map[string]string) ([]string, error)  {
 		err := errors.New("邮箱必填")
 		return nil, err
 	}
-	////行业（必选）
-	//industry, industryExisted := body[constants.Industry]
-	//if !industryExisted {
-	//	err := errors.New("行业必填")
-	//	return nil, err
-	//}
+
 	//产品序列号（必填）
 	serial, serialExisted := body[constants.Serial]
 	if !serialExisted {
@@ -334,19 +327,25 @@ func validRepairForm(body map[string]string) ([]string, error)  {
 	//附件文档
 	//TODO, 这里要支持录视频和拍照片， 以及上传文件
 
+	deviceType := firstDeviceType
+	if secondDeviceType != "" {
+		deviceType += "--" + secondDeviceType
+	}
+	if thirdDeviceType != "" {
+		deviceType += "--" + thirdDeviceType
+	}
+
 	var result []string
-	result = make([]string, 11)
+	result = make([]string, 9)
 	result[0] = company
-	result[1] = region
-	result[2] = name
-	result[3] = mobile
-	result[4] = email
-	result[5] = ""
-	result[6] = serial
-	result[7] = firstDeviceType + "--" + secondDeviceType + "--" + thirdDeviceType
-	result[8] = billAddress
-	result[9] = companyAddress
-	result[10] = bugDetail
+	result[1] = name
+	result[2] = mobile
+	result[3] = email
+	result[4] = serial
+	result[5] = deviceType
+	result[6] = billAddress
+	result[7] = companyAddress
+	result[8] = bugDetail
 	return result, nil
 }
 
@@ -453,7 +452,7 @@ func sendEmail(requestDataArray []string, excelPath string, orderNumber string )
 	subject := "新的报修单(来自微信、网页端的测试通知邮件）【测试】" + "订单号： " + orderNumber
 	contentType := "text/html"
 
-	tbody := ""
+	var tbody string
 	for index, requestData := range requestDataArray {
 		title := titleArray[index]
 		content := requestData
