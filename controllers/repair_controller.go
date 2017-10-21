@@ -277,8 +277,10 @@ func (this *RepairController) GetUserInfo()  {
 			whiteId = strings.TrimSpace(whiteId)
 			if data.OpenId == whiteId {
 				forwardUrl += "/menu/admin"
+				return
 			} else {
 				forwardUrl += "/menu/common"
+				return
 			}
 		}
 	}
