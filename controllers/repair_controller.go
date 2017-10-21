@@ -276,7 +276,7 @@ func (this *RepairController) GetUserInfo()  {
 		beego.Info("open id is not empty...")
 
 	} else {
-		userInfo = models.GetWeixinUserInfo(openId)
+		userInfo = models.GetWeixinUserInfo(code)
 		beego.Info("open id is empty....")
 		beego.Info("get userInfo from cache.....")
 

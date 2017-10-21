@@ -8,6 +8,7 @@ import (
 )
 
 type UserInfo struct {
+	Code string `json:"code"`
 	OpenId string `json:"openid"`
 	NickName string `json: "nickname"`
 	Sex int `json:"sex"`
@@ -31,6 +32,7 @@ func AddWeixinUserInfo(userData UserInfo) error {
 	c := session.DB("ndc").C("weixin_user")
 
 	_, updateErr := c.Upsert(bson.M{"openid": userData.OpenId}, bson.M{"$set": bson.M{
+		"code": userData.Code,
 		"openid": userData.OpenId,
 		"nickname": userData.NickName,
 		"sex": userData.Sex,
@@ -48,8 +50,8 @@ func AddWeixinUserInfo(userData UserInfo) error {
 	return nil
 }
 
-func GetWeixinUserInfo(openid string) UserInfo {
-	beego.Info("get weixin user by openid: "+ openid)
+func GetWeixinUserInfo(code string) UserInfo {
+	beego.Info("get weixin user by openid: "+ code)
 
 	session, _ := InitMongodbSession()
 
@@ -58,7 +60,7 @@ func GetWeixinUserInfo(openid string) UserInfo {
 	c := session.DB("ndc").C("weixin_user")
 
 	var result UserInfo
-	queryErr := c.Find(bson.M{"openid": openid}).One(&result)
+	queryErr := c.Find(bson.M{"code": code}).One(&result)
 	fmt.Println(queryErr)
 
 	return result
