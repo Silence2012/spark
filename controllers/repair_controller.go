@@ -31,17 +31,7 @@ type TokenPayload struct {
 	Scope string `json:"scope"`
 }
 
-type UserInfo struct {
-	OpenId string `json:"openid"`
-	NickName string `json: "nickname"`
-	Sex int `json:"sex"`
-	Language string `json:"language"`
-	City string `json:"city"`
-	Province string `json:"province"`
-	Country string `json:"country"`
-	HeadImgUrl string `json:"headimgurl"`
-	Privilege []string `json: "privilege"`
-}
+
 
 const (
 	AppId = "wx457ecf3c803c3774"
@@ -261,15 +251,17 @@ func (this *RepairController) GetUserInfo()  {
 	resBody, getUserInfoErr := SendHttpRequest(userInfoUrl)
 	this.HandleError(result, getUserInfoErr)
 
-	var data UserInfo
+	var data models.UserInfo
 	marshalErr := json.Unmarshal(resBody, &data)
 	this.HandleError(result, marshalErr)
 	beego.Info(data.OpenId)
 	beego.Info(data.City)
 	beego.Info(data.Country)
 	beego.Info(data.HeadImgUrl)
-	indexUrl := "http://xn.geekx.cn/"
-	this.Ctx.Redirect(302, indexUrl)
+	updateErr := models.AddWeixinUserInfo(data)
+	this.HandleError(result, updateErr)
+
+	this.Ctx.Redirect(302, Domain)
 }
 
 func SendHttpRequest(url string) ([]byte,error) {
