@@ -302,6 +302,31 @@ func (this *RepairController) GetUserInfo()  {
 	//this.Ctx.Redirect(, )
 }
 
+func (this *RepairController) GetJSApiTicket()  {
+	result := make(map[string]interface{})
+	fmt.Println("get js api ticket....................")
+
+	url := "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+AppId+"&secret="+AppSecret
+	beego.Info("access_token for jsapiticket: "+ url)
+	resBody, err := SendHttpRequest(url)
+	this.HandleError(result, err)
+	accessToken, getAccessTokenErr := getAccessToken(resBody)
+	beego.Info("accessToken for jsapiticket: "+ accessToken)
+	this.HandleError(result, getAccessTokenErr)
+
+	fmt.Println(".............................")
+
+	jsApiTicketUrl := "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token="+accessToken+"&type=jsapi"
+	resBody, getJsApiTicketErr := SendHttpRequest(jsApiTicketUrl)
+	this.HandleError(result, getJsApiTicketErr)
+
+	result["jsapi_ticket"] = resBody
+	response, marshalErr := json.Marshal(result)
+	this.HandleError(result, marshalErr)
+	this.Ctx.ResponseWriter.Write(response)
+
+}
+
 func SendHttpRequest(url string) ([]byte,error) {
 
 	beego.Info("sending http request with url: " +url)
@@ -336,6 +361,18 @@ func getAccessTokenAndOpenId(resBody []byte) (string, string, error)  {
 	openId := data.OpenId
 	
 	return accessToken, openId, nil
+	
+}
+
+func getAccessToken(resBody []byte) (string, error)  {
+	var data TokenPayload
+	err := json.Unmarshal(resBody, &data)
+	if err != nil {
+		return "", err
+	}
+	accessToken := data.AccessToken
+	
+	return accessToken, nil
 	
 }
 
