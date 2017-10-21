@@ -277,17 +277,18 @@ func (this *RepairController) GetUserInfo()  {
 	fmt.Println(whiteLists)
 	forwardUrl := Domain
 
+	adminUrl := Domain + "/menu/admin"
+	commonUrl := Domain + "/menu/common"
+
 	for _, whiteId := range whiteLists {
 		whiteId = strings.TrimSpace(whiteId)
 		if data.OpenId == whiteId {
-			forwardUrl = forwardUrl + "/menu/admin"
-			break
+			forwardUrl = adminUrl
 		} else {
-			forwardUrl = forwardUrl + "/menu/common"
-			break
+			forwardUrl = commonUrl
+
 		}
 	}
-
 
 	beego.Info("forwardUrl: " + forwardUrl)
 	this.Redirect(forwardUrl, http.StatusMovedPermanently)
