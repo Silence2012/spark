@@ -266,32 +266,37 @@ func (this *RepairController) GetUserInfo()  {
 	beego.Info(data.HeadImgUrl)
 	if data.OpenId != "" {
 		beego.Info("open id is not empty...")
-		//updateErr := models.AddWeixinUserInfo(data)
-		//this.HandleError(result, updateErr)
+		updateErr := models.AddWeixinUserInfo(data)
+		this.HandleError(result, updateErr)
+		openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
+		whiteLists := strings.Split(openIdWhiteListWithComma, ",")
+		fmt.Println("whitelists:")
+		fmt.Println(whiteLists)
+		forwardUrl := Domain
+
+		adminUrl := Domain + "/menu/admin"
+		commonUrl := Domain + "/menu/common"
+
+		for _, whiteId := range whiteLists {
+			whiteId = strings.TrimSpace(whiteId)
+			fmt.Println("whiteId: "+ whiteId)
+			fmt.Println("openId: "+ data.OpenId)
+			if data.OpenId == whiteId {
+				forwardUrl = adminUrl
+			} else {
+				forwardUrl = commonUrl
+
+			}
+		}
+
+		beego.Info("forwardUrl: " + forwardUrl)
+		this.Redirect(forwardUrl, http.StatusMovedPermanently)
 	} else {
 		beego.Info("open id is empty....")
-	}
-	openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
-	whiteLists := strings.Split(openIdWhiteListWithComma, ",")
-	fmt.Println("whitelists:")
-	fmt.Println(whiteLists)
-	forwardUrl := Domain
 
-	adminUrl := Domain + "/menu/admin"
-	commonUrl := Domain + "/menu/common"
-
-	for _, whiteId := range whiteLists {
-		whiteId = strings.TrimSpace(whiteId)
-		if data.OpenId == whiteId {
-			forwardUrl = adminUrl
-		} else {
-			forwardUrl = commonUrl
-
-		}
 	}
 
-	beego.Info("forwardUrl: " + forwardUrl)
-	this.Redirect(forwardUrl, http.StatusMovedPermanently)
+
 	//this.Ctx.Redirect(, )
 }
 
