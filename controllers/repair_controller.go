@@ -290,8 +290,8 @@ func (this *RepairController) GetUserInfo()  {
 		}
 	}
 
-	beego.Info(forwardUrl)
-	this.Ctx.Redirect(302, "http://www.baidu.com")
+	beego.Info("forwardUrl: " + forwardUrl)
+	this.Ctx.Redirect(http.StatusMovedPermanently, forwardUrl)
 }
 
 func SendHttpRequest(url string) ([]byte,error) {
