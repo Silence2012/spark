@@ -265,7 +265,7 @@ func (this *RepairController) GetUserInfo()  {
 	marshalErr := json.Unmarshal(resBody, &data)
 	this.HandleError(result, marshalErr)
 
-	indexUrl := "http://xn.geekx.cn/menu"
+	indexUrl := "http://xn.geekx.cn/"
 	this.Ctx.Redirect(302, indexUrl)
 }
 
