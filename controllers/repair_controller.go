@@ -269,34 +269,50 @@ func (this *RepairController) GetUserInfo()  {
 	beego.Info(data.City)
 	beego.Info(data.Country)
 	beego.Info(data.HeadImgUrl)
+
+	var userInfo models.UserInfo
+
 	if data.OpenId != "" {
 		beego.Info("open id is not empty...")
-		updateErr := models.AddWeixinUserInfo(data)
-		this.HandleError(result, updateErr)
-		openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
-		whiteLists := strings.Split(openIdWhiteListWithComma, ",")
-		fmt.Println("whitelists:")
-		fmt.Println(whiteLists)
 
-
-		for _, whiteId := range whiteLists {
-			whiteId = strings.TrimSpace(whiteId)
-			fmt.Println("whiteId: "+ whiteId)
-			fmt.Println("openId: "+ data.OpenId)
-			if data.OpenId == whiteId {
-				forwardUrl = adminUrl
-			} else {
-				forwardUrl = commonUrl
-
-			}
-		}
-
-		beego.Info("forwardUrl: " + forwardUrl)
-		this.Redirect(forwardUrl, http.StatusMovedPermanently)
 	} else {
+		userInfo = models.GetWeixinUserInfo(openId)
 		beego.Info("open id is empty....")
-		this.Redirect(commonUrl, http.StatusMovedPermanently)
+		beego.Info("get userInfo from cache.....")
+
 	}
+
+	updateErr := models.AddWeixinUserInfo(data)
+	this.HandleError(result, updateErr)
+	openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
+	whiteLists := strings.Split(openIdWhiteListWithComma, ",")
+	fmt.Println("whitelists:")
+	fmt.Println(whiteLists)
+
+	var compareId string
+	if data.OpenId != "" {
+		compareId = data.OpenId
+	}else if openId != "" {
+		compareId = openId
+	} else {
+		compareId = userInfo.OpenId
+	}
+	for _, whiteId := range whiteLists {
+		whiteId = strings.TrimSpace(whiteId)
+		fmt.Println("whiteId: "+ whiteId)
+		fmt.Println("openId: "+ data.OpenId)
+		fmt.Println("userInfo.openId: "+ userInfo.OpenId)
+
+		if compareId == whiteId {
+			forwardUrl = adminUrl
+		} else {
+			forwardUrl = commonUrl
+
+		}
+	}
+
+	beego.Info("forwardUrl: " + forwardUrl)
+	this.Redirect(forwardUrl, http.StatusMovedPermanently)
 
 
 	//this.Ctx.Redirect(, )

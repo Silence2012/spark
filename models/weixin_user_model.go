@@ -3,6 +3,8 @@ package models
 import (
 	"gopkg.in/mgo.v2/bson"
 	"github.com/astaxie/beego"
+
+	"fmt"
 )
 
 type UserInfo struct {
@@ -45,4 +47,21 @@ func AddWeixinUserInfo(userData UserInfo) error {
 	}
 	return nil
 }
+
+func GetWeixinUserInfo(openid string) UserInfo {
+	beego.Info("get weixin user by openid: "+ openid)
+
+	session, _ := InitMongodbSession()
+
+	defer session.Close()
+
+	c := session.DB("ndc").C("weixin_user")
+
+	var result UserInfo
+	queryErr := c.Find(bson.M{"openid": openid}).One(&result)
+	fmt.Println(queryErr)
+
+	return result
+}
+
 
