@@ -51,4 +51,8 @@ const (
 	ExcelDir = "excelDir"
 
 	OpenIdWhiteList = "openIdWhiteList"
+
+	RedisIp = "redisIP"
+	RedisPort = "redisPort"
+	RedisPassword = "redisPassword"
 )
