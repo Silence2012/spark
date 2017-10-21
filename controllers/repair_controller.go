@@ -276,9 +276,9 @@ func (this *RepairController) GetUserInfo()  {
 	for _, whiteId := range whiteLists {
 		whiteId = strings.TrimSpace(whiteId)
 		if data.OpenId == whiteId {
-			forwardUrl += "/admin"
+			forwardUrl += "/menu/admin"
 		} else {
-			forwardUrl += "/common"
+			forwardUrl += "/menu/common"
 		}
 	}
 	beego.Info(forwardUrl)
