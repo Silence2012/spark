@@ -264,7 +264,10 @@ func (this *RepairController) GetUserInfo()  {
 	var data UserInfo
 	marshalErr := json.Unmarshal(resBody, &data)
 	this.HandleError(result, marshalErr)
-
+	beego.Info(data.OpenId)
+	beego.Info(data.City)
+	beego.Info(data.Country)
+	beego.Info(data.HeadImgUrl)
 	indexUrl := "http://xn.geekx.cn/"
 	this.Ctx.Redirect(302, indexUrl)
 }
