@@ -239,8 +239,8 @@ func (this *RepairController) GetUserInfo()  {
 	var state string
 	this.Ctx.Input.Bind(&state, "state")
 	this.Ctx.Input.Bind(&code, "code")
-	fmt.Println(code)
-	fmt.Println(state)
+	fmt.Println("code: " + code)
+	fmt.Println("state: " + state)
 
 	url := "https://api.weixin.qq.com/sns/oauth2/access_token?appid="+AppId+"&secret="+AppSecret+"&code="+code+"&grant_type=authorization_code"
 	beego.Info("access_token: "+ url)
@@ -276,14 +276,17 @@ func (this *RepairController) GetUserInfo()  {
 		beego.Info("open id is not empty...")
 
 	} else {
+		beego.Info("open id is empty, CODE: "+ code)
 		userInfo = models.GetWeixinUserInfo(code)
 		beego.Info("open id is empty....")
 		beego.Info("get userInfo from cache.....")
 		beego.Info(userInfo)
 	}
+	if code != "" {
+		updateErr := models.AddWeixinUserInfo(data)
+		this.HandleError(result, updateErr)
+	}
 
-	updateErr := models.AddWeixinUserInfo(data)
-	this.HandleError(result, updateErr)
 	openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
 	whiteLists := strings.Split(openIdWhiteListWithComma, ",")
 	fmt.Println("whitelists:")
