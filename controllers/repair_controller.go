@@ -258,8 +258,12 @@ func (this *RepairController) GetUserInfo()  {
 	beego.Info(data.City)
 	beego.Info(data.Country)
 	beego.Info(data.HeadImgUrl)
-	updateErr := models.AddWeixinUserInfo(data)
-	this.HandleError(result, updateErr)
+	if data.OpenId != "" {
+		updateErr := models.AddWeixinUserInfo(data)
+		this.HandleError(result, updateErr)
+	} else {
+		beego.Info("open id is empty....")
+	}
 
 	this.Ctx.Redirect(302, Domain)
 }
