@@ -8,9 +8,9 @@ import (
 	"errors"
 	"../models"
 	"../utils"
-
+	"io/ioutil"
 	"strings"
-
+	"net/http"
 	"fmt"
 )
 
@@ -23,6 +23,31 @@ type RepairFormStatusList []struct {
 	Count int    `json:"count"`
 }
 
+type TokenPayload struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn int `json:"expires_in"`
+	RefreshToken string `json:"refresh_token"`
+	OpenId string `json:"openid"`
+	Scope string `json:"scope"`
+}
+
+type UserInfo struct {
+	OpenId string `json:"openid"`
+	NickName string `json: "nickname"`
+	Sex string `json:"sex"`
+	Language string `json:"language"`
+	City string `json:"city"`
+	Province string `json:"province"`
+	Country string `json:"country"`
+	HeadImgUrl string `json:"headimgurl"`
+	Privilege []string `json: "privilege"`
+}
+
+const (
+	AppId = "wx457ecf3c803c3774"
+	AppSecret = "11010d8c74deb1daa9c672f54846fc48"
+	Domain = "http://xn.geekx.cn"
+)
 var titleArray = []string{"公司名称", "真实姓名", "手机号码", "邮箱", "产品序列号", "设备类型", "寄付帐单地址", "详细公司地址", "故障细节"}
 
 func (this *RepairController) DeleteOrderId() {
@@ -212,10 +237,13 @@ func (this *RepairController) TopOrder()  {
 	this.Ctx.ResponseWriter.Write([]byte(constants.SUCCESS))
 }
 
+func (this *RepairController) GetWeixinCode()  {
+	SendHttpRequest("https://open.weixin.qq.com/connect/oauth2/authorize?appid="+AppId+"&redirect_uri="+Domain+"/repairs/weixin-token&response_type=code&scope=snsapi_userinfo&state=1")
+}
 
-//置顶订单
-func (this *RepairController) GetAccountInfo()  {
-
+func (this *RepairController) GetUserInfo()  {
+	result := make(map[string]interface{})
+	fmt.Println("get user info")
 	var code string
 	var state string
 	this.Ctx.Input.Bind(&state, "state")
@@ -223,8 +251,61 @@ func (this *RepairController) GetAccountInfo()  {
 	fmt.Println(code)
 	fmt.Println(state)
 
-	this.Ctx.ResponseWriter.Write([]byte(code))
+	url := "https://api.weixin.qq.com/sns/oauth2/access_token?appid="+AppId+"&secret="+AppSecret+"&code="+code+"&grant_type=authorization_code"
+	resBody, err := SendHttpRequest(url)
+	this.HandleError(result, err)
+	accessToken, openId, getAccessTokenErr := getAccessTokenAndOpenId(resBody)
+	this.HandleError(result, getAccessTokenErr)
+
+	userInfoUrl := "https://api.weixin.qq.com/sns/userinfo?access_token="+accessToken+"&openid="+ openId
+	resBody, getUserInfoErr := SendHttpRequest(userInfoUrl)
+	this.HandleError(result, getUserInfoErr)
+
+	var data UserInfo
+	marshalErr := json.Unmarshal(resBody, &data)
+	this.HandleError(result, marshalErr)
+
+	indexUrl := "http://xn.geekx.cn/menu"
+	this.Ctx.Redirect(302, indexUrl)
 }
+
+func SendHttpRequest(url string) ([]byte,error) {
+
+	beego.Info("sending http request with url: " +url)
+	transport := &http.Transport{DisableKeepAlives: false, MaxIdleConnsPerHost: 500}
+	req, _ := http.NewRequest("GET", url, nil)
+	req.Close = false
+
+	res, err := transport.RoundTrip(req)
+	if err != nil {
+		return nil, err
+	}
+	body, _ := ioutil.ReadAll(res.Body)
+
+	if transport != nil {
+		transport.CloseIdleConnections()
+	}
+
+	if res != nil && res.Body != nil {
+		res.Body.Close()
+	}
+
+	return body, nil
+}
+
+func getAccessTokenAndOpenId(resBody []byte) (string, string, error)  {
+	var data TokenPayload
+	err := json.Unmarshal(resBody, &data)
+	if err != nil {
+		return "", "", err
+	}
+	accessToken := data.AccessToken
+	openId := data.OpenId
+	
+	return accessToken, openId, nil
+	
+}
+
 
 
 func validTopOrder(body map[string]string) (bool, error) {
