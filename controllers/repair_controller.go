@@ -251,9 +251,7 @@ func (this *RepairController) GetUserInfo()  {
 	beego.Info("openId: "+ openId)
 	this.HandleError(result, getAccessTokenErr)
 
-	if accessToken == "" || openId == "" {
-		return
-	}
+	fmt.Println(".............................")
 
 	userInfoUrl := "https://api.weixin.qq.com/sns/userinfo?access_token="+accessToken+"&openid="+ openId
 	resBody, getUserInfoErr := SendHttpRequest(userInfoUrl)
@@ -275,17 +273,18 @@ func (this *RepairController) GetUserInfo()  {
 	}
 	openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
 	whiteLists := strings.Split(openIdWhiteListWithComma, ",")
-
+	fmt.Println("whitelists:")
+	fmt.Println(whiteLists)
 	forwardUrl := Domain
 	if data.OpenId != "" {
 		for _, whiteId := range whiteLists {
 			whiteId = strings.TrimSpace(whiteId)
 			if data.OpenId == whiteId {
 				forwardUrl += "/menu/admin"
-				return
+				break
 			} else {
 				forwardUrl += "/menu/common"
-				return
+				break
 			}
 		}
 	}
