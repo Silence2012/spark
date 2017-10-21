@@ -228,12 +228,13 @@ func (this *RepairController) TopOrder()  {
 }
 
 func (this *RepairController) GetWeixinCode()  {
+	beego.Info("get weixin token ............")
 	SendHttpRequest("https://open.weixin.qq.com/connect/oauth2/authorize?appid="+AppId+"&redirect_uri="+Domain+"/repairs/weixin-token&response_type=code&scope=snsapi_userinfo&state=1")
 }
 
 func (this *RepairController) GetUserInfo()  {
 	result := make(map[string]interface{})
-	fmt.Println("get user info")
+	fmt.Println("get user info....................")
 	var code string
 	var state string
 	this.Ctx.Input.Bind(&state, "state")
@@ -242,9 +243,12 @@ func (this *RepairController) GetUserInfo()  {
 	fmt.Println(state)
 
 	url := "https://api.weixin.qq.com/sns/oauth2/access_token?appid="+AppId+"&secret="+AppSecret+"&code="+code+"&grant_type=authorization_code"
+	beego.Info("access_token: "+ url)
 	resBody, err := SendHttpRequest(url)
 	this.HandleError(result, err)
 	accessToken, openId, getAccessTokenErr := getAccessTokenAndOpenId(resBody)
+	beego.Info("accessToken: "+ accessToken)
+	beego.Info("openId: "+ openId)
 	this.HandleError(result, getAccessTokenErr)
 
 	userInfoUrl := "https://api.weixin.qq.com/sns/userinfo?access_token="+accessToken+"&openid="+ openId
