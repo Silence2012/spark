@@ -270,7 +270,7 @@ func (this *RepairController) GetUserInfo()  {
 	beego.Info(data.Country)
 	beego.Info(data.HeadImgUrl)
 
-	var userInfo models.UserInfo
+	var userInfo interface{}
 
 	if data.OpenId != "" {
 		beego.Info("open id is not empty...")
@@ -279,7 +279,7 @@ func (this *RepairController) GetUserInfo()  {
 		userInfo = models.GetWeixinUserInfo(code)
 		beego.Info("open id is empty....")
 		beego.Info("get userInfo from cache.....")
-
+		beego.Info(userInfo)
 	}
 
 	updateErr := models.AddWeixinUserInfo(data)

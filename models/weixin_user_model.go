@@ -50,7 +50,7 @@ func AddWeixinUserInfo(userData UserInfo) error {
 	return nil
 }
 
-func GetWeixinUserInfo(code string) UserInfo {
+func GetWeixinUserInfo(code string) interface{} {
 	beego.Info("get weixin user by openid: "+ code)
 
 	session, _ := InitMongodbSession()
@@ -59,7 +59,7 @@ func GetWeixinUserInfo(code string) UserInfo {
 
 	c := session.DB("ndc").C("weixin_user")
 
-	var result UserInfo
+	var result interface{}
 	queryErr := c.Find(bson.M{"code": code}).One(&result)
 	fmt.Println(queryErr)
 
