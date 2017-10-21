@@ -295,13 +295,13 @@ func (this *RepairController) GetUserInfo()  {
 	}else if openId != "" {
 		compareId = openId
 	} else {
-		compareId = userInfo.OpenId
+		//compareId = userInfo.OpenId
 	}
 	for _, whiteId := range whiteLists {
 		whiteId = strings.TrimSpace(whiteId)
 		fmt.Println("whiteId: "+ whiteId)
 		fmt.Println("openId: "+ data.OpenId)
-		fmt.Println("userInfo.openId: "+ userInfo.OpenId)
+		//fmt.Println("userInfo.openId: "+ userInfo.OpenId)
 
 		if compareId == whiteId {
 			forwardUrl = adminUrl
