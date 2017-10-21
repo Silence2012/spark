@@ -277,7 +277,8 @@ func (this *RepairController) GetUserInfo()  {
 			forwardUrl += "/common"
 		}
 	}
-	this.Ctx.Redirect(302, Domain)
+	beego.Info(forwardUrl)
+	this.Ctx.Redirect(302, forwardUrl)
 }
 
 func SendHttpRequest(url string) ([]byte,error) {
