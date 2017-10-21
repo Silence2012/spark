@@ -291,7 +291,7 @@ func (this *RepairController) GetUserInfo()  {
 	}
 
 	beego.Info(forwardUrl)
-	this.Ctx.Redirect(302, forwardUrl)
+	this.Ctx.Redirect(302, "http://www.baidu.com")
 }
 
 func SendHttpRequest(url string) ([]byte,error) {
