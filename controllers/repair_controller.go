@@ -34,7 +34,7 @@ type TokenPayload struct {
 type UserInfo struct {
 	OpenId string `json:"openid"`
 	NickName string `json: "nickname"`
-	Sex string `json:"sex"`
+	Sex int `json:"sex"`
 	Language string `json:"language"`
 	City string `json:"city"`
 	Province string `json:"province"`
