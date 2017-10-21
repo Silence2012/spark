@@ -49,4 +49,6 @@ const (
 
 
 	ExcelDir = "excelDir"
+
+	OpenIdWhiteList = "openIdWhiteList"
 )

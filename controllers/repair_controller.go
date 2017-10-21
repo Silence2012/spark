@@ -264,7 +264,19 @@ func (this *RepairController) GetUserInfo()  {
 	} else {
 		beego.Info("open id is empty....")
 	}
+	openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
+	whiteLists := strings.Split(openIdWhiteListWithComma, ",")
 
+	forwardUrl := Domain
+
+	for _, whiteId := range whiteLists {
+		whiteId = strings.TrimSpace(whiteId)
+		if data.OpenId == whiteId {
+			forwardUrl += "/admin"
+		} else {
+			forwardUrl += "/common"
+		}
+	}
 	this.Ctx.Redirect(302, Domain)
 }
 
