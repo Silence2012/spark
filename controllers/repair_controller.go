@@ -267,8 +267,9 @@ func (this *RepairController) GetUserInfo()  {
 	beego.Info(data.Country)
 	beego.Info(data.HeadImgUrl)
 	if data.OpenId != "" {
-		updateErr := models.AddWeixinUserInfo(data)
-		this.HandleError(result, updateErr)
+		beego.Info("open id is not empty...")
+		//updateErr := models.AddWeixinUserInfo(data)
+		//this.HandleError(result, updateErr)
 	} else {
 		beego.Info("open id is empty....")
 	}
