@@ -251,42 +251,42 @@ func (this *RepairController) GetUserInfo()  {
 	beego.Info("openId: "+ openId)
 	this.HandleError(result, getAccessTokenErr)
 
-	userInfoUrl := "https://api.weixin.qq.com/sns/userinfo?access_token="+accessToken+"&openid="+ openId
-	resBody, getUserInfoErr := SendHttpRequest(userInfoUrl)
-	this.HandleError(result, getUserInfoErr)
-
-	var data models.UserInfo
-	marshalErr := json.Unmarshal(resBody, &data)
-	this.HandleError(result, marshalErr)
-	beego.Info(data.OpenId)
-	beego.Info(data.City)
-	beego.Info(data.Country)
-	beego.Info(data.HeadImgUrl)
-	if data.OpenId != "" {
-		updateErr := models.AddWeixinUserInfo(data)
-		this.HandleError(result, updateErr)
-	} else {
-		beego.Info("open id is empty....")
-	}
-	openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
-	whiteLists := strings.Split(openIdWhiteListWithComma, ",")
-
-	forwardUrl := Domain
-	if data.OpenId != "" {
-		for _, whiteId := range whiteLists {
-			whiteId = strings.TrimSpace(whiteId)
-			if data.OpenId == whiteId {
-				forwardUrl += "/menu/admin"
-				return
-			} else {
-				forwardUrl += "/menu/common"
-				return
-			}
-		}
-	}
-
-	beego.Info(forwardUrl)
-	this.Ctx.Redirect(302, forwardUrl)
+	//userInfoUrl := "https://api.weixin.qq.com/sns/userinfo?access_token="+accessToken+"&openid="+ openId
+	//resBody, getUserInfoErr := SendHttpRequest(userInfoUrl)
+	//this.HandleError(result, getUserInfoErr)
+	//
+	//var data models.UserInfo
+	//marshalErr := json.Unmarshal(resBody, &data)
+	//this.HandleError(result, marshalErr)
+	//beego.Info(data.OpenId)
+	//beego.Info(data.City)
+	//beego.Info(data.Country)
+	//beego.Info(data.HeadImgUrl)
+	//if data.OpenId != "" {
+	//	updateErr := models.AddWeixinUserInfo(data)
+	//	this.HandleError(result, updateErr)
+	//} else {
+	//	beego.Info("open id is empty....")
+	//}
+	//openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
+	//whiteLists := strings.Split(openIdWhiteListWithComma, ",")
+	//
+	//forwardUrl := Domain
+	//if data.OpenId != "" {
+	//	for _, whiteId := range whiteLists {
+	//		whiteId = strings.TrimSpace(whiteId)
+	//		if data.OpenId == whiteId {
+	//			forwardUrl += "/menu/admin"
+	//			return
+	//		} else {
+	//			forwardUrl += "/menu/common"
+	//			return
+	//		}
+	//	}
+	//}
+	//
+	//beego.Info(forwardUrl)
+	//this.Ctx.Redirect(302, forwardUrl)
 }
 
 func SendHttpRequest(url string) ([]byte,error) {
