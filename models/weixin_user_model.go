@@ -24,7 +24,7 @@ func AddWeixinUserInfo(userData UserInfo) error {
 	}
 	defer session.Close()
 
-	c := session.DB("ndc").C("repairforms")
+	c := session.DB("ndc").C("weixin_user")
 
 	_, updateErr := c.Upsert(bson.M{"openid": userData.OpenId}, bson.M{"$set": bson.M{
 		"openid": userData.OpenId,
