@@ -257,6 +257,11 @@ func (this *RepairController) GetUserInfo()  {
 	resBody, getUserInfoErr := SendHttpRequest(userInfoUrl)
 	this.HandleError(result, getUserInfoErr)
 
+	forwardUrl := Domain
+
+	adminUrl := Domain + "/menu/admin"
+	commonUrl := Domain + "/menu/common"
+
 	var data models.UserInfo
 	marshalErr := json.Unmarshal(resBody, &data)
 	this.HandleError(result, marshalErr)
@@ -272,10 +277,7 @@ func (this *RepairController) GetUserInfo()  {
 		whiteLists := strings.Split(openIdWhiteListWithComma, ",")
 		fmt.Println("whitelists:")
 		fmt.Println(whiteLists)
-		forwardUrl := Domain
 
-		adminUrl := Domain + "/menu/admin"
-		commonUrl := Domain + "/menu/common"
 
 		for _, whiteId := range whiteLists {
 			whiteId = strings.TrimSpace(whiteId)
@@ -293,7 +295,7 @@ func (this *RepairController) GetUserInfo()  {
 		this.Redirect(forwardUrl, http.StatusMovedPermanently)
 	} else {
 		beego.Info("open id is empty....")
-
+		this.Redirect(commonUrl, http.StatusMovedPermanently)
 	}
 
 
