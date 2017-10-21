@@ -2,6 +2,7 @@ package models
 
 import (
 	"gopkg.in/mgo.v2/bson"
+	"github.com/astaxie/beego"
 )
 
 type UserInfo struct {
@@ -17,7 +18,8 @@ type UserInfo struct {
 }
 
 func AddWeixinUserInfo(userData UserInfo) error {
-
+	beego.Info("add weixin user info....")
+	beego.Info(userData)
 	session, err := InitMongodbSession()
 	if err != nil {
 		return  err
