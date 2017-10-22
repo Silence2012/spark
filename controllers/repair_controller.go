@@ -319,7 +319,7 @@ func (this *RepairController) GetUserDetailAsync(code string)  {
 		whiteId = strings.TrimSpace(whiteId)
 		compareId = strings.TrimSpace(compareId)
 		fmt.Println("whiteId: "+ whiteId)
-		fmt.Println("openId: "+ data.OpenId)
+		fmt.Println("compareId: "+ compareId)
 		//fmt.Println("userInfo.openId: "+ userInfo.OpenId)
 
 		if compareId == whiteId {
