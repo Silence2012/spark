@@ -92,8 +92,10 @@ type RepairForm struct {
 	Top bool
 	//置顶时间
 	TopTime int64
-
-
+	//录音id
+	AudioMediaId string
+	//图片id
+	ImageMediaId string
 }
 
 type RepairOrder struct {
@@ -144,6 +146,9 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			},
 			false,
 			0,
+			"",
+			"",
+
 		})
 	if err != nil {
 		return err

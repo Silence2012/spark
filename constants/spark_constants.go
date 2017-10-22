@@ -20,6 +20,8 @@ const (
 	BillAddress = "billAddress"
 	CompanyAddress = "companyAddress"
 	BugDetail = "bugDetail"
+	AudioMediaId = "audioMediaId"
+	ImageMediaId = "imageMediaId"
 
 	OrderId = "orderId"
 

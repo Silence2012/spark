@@ -71,6 +71,7 @@ func (this *RepairController) SaveRepairForm() {
 
 	err := json.Unmarshal(bodyJson, &body)
 	this.HandleError(result, err)
+
 	//验证输入项
 	requestDataArray, validErr := validRepairForm(body)
 	this.HandleError(result, validErr)
@@ -475,6 +476,14 @@ func validTopOrder(body map[string]string) (bool, error) {
 
 
 func validRepairForm(body map[string]string) ([]string, error)  {
+
+	audioId, audioIdExist := body[constants.AudioMediaId]
+	beego.Info("audio id: "+ audioId)
+	beego.Info(audioIdExist)
+
+	imageId, imageIdExist := body[constants.ImageMediaId]
+	beego.Info("image id: "+ imageId)
+	beego.Info(imageIdExist)
 
 	//公司名称
 	company, companyExised := body[constants.Company]
