@@ -353,6 +353,7 @@ func (this *RepairController) GetJSApiTicket()  {
 	ticket, ticketErr := utils.GetTicket()
 	beego.Info("get ticket from redis error: ")
 	beego.Info(ticketErr)
+	beego.Info("ticket1: " + ticket)
 	this.HandleError(result, ticketErr)
 	beego.Info("ticket: " + ticket)
 	if ticket == "" {
