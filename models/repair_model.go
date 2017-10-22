@@ -95,7 +95,7 @@ type RepairForm struct {
 	//录音id
 	AudioMediaId string
 	//图片id
-	ImageMediaId string
+	ImageMediaId []string
 }
 
 type RepairOrder struct {
@@ -147,7 +147,7 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			false,
 			0,
 			"",
-			"",
+			nil,
 
 		})
 	if err != nil {

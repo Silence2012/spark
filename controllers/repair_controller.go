@@ -94,13 +94,16 @@ func (this *RepairController) SaveRepairForm() {
 	}
 	body[constants.OrderId] = orderNumber
 	audioId, _ := body[constants.AudioMediaId]
-	imageId, _ := body[constants.ImageMediaId]
+	imageIds, _ := body[constants.ImageMediaId]
+	imageIdArray := strings.Split(imageIds, ",")
+
 	audioPath, audioErr := GetAudioFromWeixinServerByGoHttp(orderNumber, audioId)
-	imagePath, imageErr := GetImagesFromWeixinServerByGoHttp(orderNumber, imageId)
+	imageArray := DownloadImages(orderNumber, imageIdArray)
+
 	beego.Info("download audio err:")
 	beego.Info(audioErr)
-	beego.Info("download image err:")
-	beego.Info(imageErr)
+	beego.Info("imageArray:")
+	beego.Info(imageArray)
 	//持久化输入项
 	addErr := models.AddRepairForm(body)
 	if addErr != nil {
@@ -111,26 +114,31 @@ func (this *RepairController) SaveRepairForm() {
 	excelPath := generateExcel(requestDataArray, orderNumber)
 
 	var attachments []string
-	if audioPath == "" && imagePath == "" {
+	if audioPath == "" && len(imageArray) == 0{
 		beego.Info("audio path and image path are empty")
 		attachments = make([]string, 1)
 		attachments[0] = excelPath
-	} else if audioPath == "" && imagePath != "" {
+	} else if audioPath == "" && len(imageArray) > 0 {
 		beego.Info("audio path is empty and image path is not empty")
-		attachments = make([]string, 2)
+		arrayLength := len(imageArray) + 1
+		attachments = make([]string, arrayLength)
 		attachments[0] = excelPath
-		attachments[1] = imagePath
-	} else if audioPath != "" && imagePath == "" {
+		for index, image := range imageArray {
+			attachments[index + 1] = image
+		}
+	} else if audioPath != "" && len(imageArray) == 0 {
 		beego.Info("audio path is not empty and image path is empty")
 		attachments = make([]string, 2)
 		attachments[0] = excelPath
 		attachments[1] = audioPath
-	} else if audioPath != "" && imagePath != ""{
+	} else if audioPath != "" && len(imageArray) > 0 {
 		beego.Info("audio path is not empty and image path is not empty")
 		attachments = make([]string, 3)
 		attachments[0] = excelPath
 		attachments[1] = audioPath
-		attachments[2] = imagePath
+		for index, image := range imageArray {
+			attachments[index + 2] = image
+		}
 	}
 	beego.Info("attachments: ")
 	beego.Info(attachments)
@@ -819,6 +827,16 @@ func GetAudioFromWeixinServerByGoHttp(orderId string, mediaId string) (string, e
 	}
 
 	return result, nil
+}
+
+func DownloadImages(orderId string, mediaIds []string) []string  {
+	result := make([]string, len(mediaIds))
+	for index, mediaId := range mediaIds {
+		imagePath, _ := GetImagesFromWeixinServerByGoHttp(orderId, mediaId)
+		result[index] = imagePath
+	}
+
+	return result
 }
 
 func GetImagesFromWeixinServerByGoHttp(orderId string, mediaId string) (string, error) {
