@@ -110,10 +110,25 @@ func (this *RepairController) SaveRepairForm() {
 	//生成excel,文件名就是订单号，保存到本地
 	excelPath := generateExcel(requestDataArray, orderNumber)
 
-	attachments := make([]string, 3)
-	attachments[0] = excelPath
-	attachments[1] = audioPath
-	attachments[2] = imagePath
+	var attachments []string
+	if audioPath == "" && imagePath == "" {
+		attachments := make([]string, 1)
+		attachments[0] = excelPath
+	} else if audioPath == "" && imagePath != "" {
+		attachments := make([]string, 2)
+		attachments[0] = excelPath
+		attachments[1] = imagePath
+	} else if audioPath != "" && imagePath == "" {
+		attachments := make([]string, 2)
+		attachments[0] = excelPath
+		attachments[1] = audioPath
+	} else if audioPath != "" && imagePath != ""{
+		attachments := make([]string, 3)
+		attachments[0] = excelPath
+		attachments[1] = audioPath
+		attachments[2] = imagePath
+	}
+
 
 	//发送邮件
 	sendEmail(requestDataArray, attachments,orderNumber)
@@ -772,6 +787,10 @@ func validEngineerOperations(body map[string]string) error  {
 }
 
 func GetAudioFromWeixinServerByGoHttp(orderId string, mediaId string) (string, error) {
+	if mediaId == "" {
+		beego.Info("没有上传录音")
+		return "", nil
+	}
 	binaryPath := BinaryRootPath + orderId
 	if !PathExists(binaryPath) {
 		os.MkdirAll(binaryPath, 0777)
@@ -798,6 +817,11 @@ func GetAudioFromWeixinServerByGoHttp(orderId string, mediaId string) (string, e
 }
 
 func GetImagesFromWeixinServerByGoHttp(orderId string, mediaId string) (string, error) {
+	if mediaId == "" {
+		beego.Info("没有上传图片")
+		return "", nil
+	}
+
 	binaryPath := BinaryRootPath + orderId
 	if !PathExists(binaryPath) {
 		os.MkdirAll(binaryPath, 0777)
