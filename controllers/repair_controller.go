@@ -382,6 +382,8 @@ func (this *RepairController) GetAccessToken() string {
 		beego.Info("access_token for jsapiticket: "+ url)
 		resBody, err := SendHttpRequest(url)
 		this.HandleError(result, err)
+		beego.Info("res body from token api: ")
+		beego.Info(string(resBody))
 		accessToken, getAccessTokenErr = getAccessToken(resBody)
 		beego.Info("accessToken for jsapiticket: "+ accessToken)
 		this.HandleError(result, getAccessTokenErr)
