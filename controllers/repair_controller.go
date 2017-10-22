@@ -31,6 +31,13 @@ type TokenPayload struct {
 	Scope string `json:"scope"`
 }
 
+type TicketPayload struct {
+	ErrCode int `json: "errcode"`
+	ErrMsg string `json: "errmsg"`
+	Ticket string `json: "ticket"`
+	ExpiresIn int `json: "expires_in"`
+}
+
 
 
 const (
@@ -339,24 +346,50 @@ func (this *RepairController) GetJSApiTicket()  {
 	result := make(map[string]interface{})
 	fmt.Println("get js api ticket....................")
 
-	url := "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+AppId+"&secret="+AppSecret
-	beego.Info("access_token for jsapiticket: "+ url)
-	resBody, err := SendHttpRequest(url)
-	this.HandleError(result, err)
-	accessToken, getAccessTokenErr := getAccessToken(resBody)
-	beego.Info("accessToken for jsapiticket: "+ accessToken)
-	this.HandleError(result, getAccessTokenErr)
+	accessToken := this.GetAccessToken()
 
 	fmt.Println(".............................")
 
-	jsApiTicketUrl := "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token="+accessToken+"&type=jsapi"
-	resBody, getJsApiTicketErr := SendHttpRequest(jsApiTicketUrl)
-	this.HandleError(result, getJsApiTicketErr)
+	ticket, ticketErr := utils.GetTicket()
+	beego.Info("get ticket from redis error: ")
+	beego.Info(ticketErr)
+	this.HandleError(result, ticketErr)
+	if ticket == "" {
+		jsApiTicketUrl := "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token="+accessToken+"&type=jsapi"
+		resBody, getJsApiTicketErr := SendHttpRequest(jsApiTicketUrl)
+		this.HandleError(result, getJsApiTicketErr)
+		ticket, ticketErr = getTicket(resBody)
+		this.HandleError(result, ticketErr)
 
-	result["jsapi_ticket"] = resBody
+		utils.WriteTicket(ticket)
+	}
+
+	result["jsapi_ticket"] = ticket
+	result["appId"] = AppId
 	response, marshalErr := json.Marshal(result)
 	this.HandleError(result, marshalErr)
 	this.Ctx.ResponseWriter.Write(response)
+
+}
+
+func (this *RepairController) GetAccessToken() string {
+	result := make(map[string]interface{})
+	fmt.Println("get js api ticket....................")
+
+	accessToken, getAccessTokenErr := utils.GetAccessToken()
+	if accessToken == "" {
+		url := "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+AppId+"&secret="+AppSecret
+		beego.Info("access_token for jsapiticket: "+ url)
+		resBody, err := SendHttpRequest(url)
+		this.HandleError(result, err)
+		accessToken, getAccessTokenErr = getAccessToken(resBody)
+		beego.Info("accessToken for jsapiticket: "+ accessToken)
+		this.HandleError(result, getAccessTokenErr)
+
+		utils.WriteAccessToken(accessToken)
+	}
+
+	return accessToken
 
 }
 
@@ -384,6 +417,16 @@ func SendHttpRequest(url string) ([]byte,error) {
 	return body, nil
 }
 
+func getTicket(resBody []byte) (string, error)  {
+
+	var data TicketPayload
+	err := json.Unmarshal(resBody, &data)
+	if err != nil {
+		return "", err
+	}
+	ticket := data.Ticket
+	return ticket, nil
+}
 func getAccessTokenAndOpenId(resBody []byte) (string, string, error)  {
 	var data TokenPayload
 	err := json.Unmarshal(resBody, &data)
