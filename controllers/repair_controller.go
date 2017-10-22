@@ -729,8 +729,10 @@ func validEngineerOperations(body map[string]string) error  {
 
 
 func (this *RepairController) HandleError (result map[string]interface{}, err error) {
-
+	beego.Info("handle err: ")
+	beego.Info(err)
 	if err != nil {
+		beego.Info("err is not nil")
 		this.Ctx.Output.Status = 503
 		result[constants.ERROR] = err.Error()
 		response, _ := json.Marshal(result)
