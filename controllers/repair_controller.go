@@ -726,6 +726,8 @@ func sendEmail(requestDataArray []string, atts []string, orderNumber string )  {
 			<p>&nbsp;</p>`
 
 	attachment := atts
+	beego.Info("attachement: ")
+	beego.Info(attachment)
 
 	utils.SendEmail(from, to, cc, subject, contentType, body, attachment...)
 }
