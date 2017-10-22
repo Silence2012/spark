@@ -133,7 +133,8 @@ func (this *RepairController) SaveRepairForm() {
 		attachments[1] = audioPath
 	} else if audioPath != "" && len(imageArray) > 0 {
 		beego.Info("audio path is not empty and image path is not empty")
-		attachments = make([]string, 3)
+		arrayLength := len(imageArray) + 2
+		attachments = make([]string, arrayLength)
 		attachments[0] = excelPath
 		attachments[1] = audioPath
 		for index, image := range imageArray {
