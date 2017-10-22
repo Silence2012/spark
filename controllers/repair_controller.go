@@ -12,6 +12,10 @@ import (
 	"strings"
 	"net/http"
 	"fmt"
+	"os/exec"
+	"os"
+	"strconv"
+	"time"
 )
 
 type RepairController struct {
@@ -44,6 +48,7 @@ const (
 	AppId = "wx457ecf3c803c3774"
 	AppSecret = "11010d8c74deb1daa9c672f54846fc48"
 	Domain = "http://xn.geekx.cn"
+	BinaryRootPath = "/home/spa/binary/"
 )
 var titleArray = []string{"公司名称", "真实姓名", "手机号码", "邮箱", "产品序列号", "设备类型", "寄付帐单地址", "详细公司地址", "故障细节"}
 
@@ -88,6 +93,14 @@ func (this *RepairController) SaveRepairForm() {
 		this.HandleError(result, orderErr)
 	}
 	body[constants.OrderId] = orderNumber
+	audioId, _ := body[constants.AudioMediaId]
+	imageId, _ := body[constants.ImageMediaId]
+	audioPath, audioErr := GetAudioFromWeixinServer(orderNumber, audioId)
+	imagePath, imageErr := GetImagesFromWeixinServer(orderNumber, imageId)
+	beego.Info("download audio err:")
+	beego.Info(audioErr)
+	beego.Info("download image err:")
+	beego.Info(imageErr)
 	//持久化输入项
 	addErr := models.AddRepairForm(body)
 	if addErr != nil {
@@ -96,8 +109,14 @@ func (this *RepairController) SaveRepairForm() {
 
 	//生成excel,文件名就是订单号，保存到本地
 	excelPath := generateExcel(requestDataArray, orderNumber)
+
+	attachments := make([]string, 3)
+	attachments[0] = excelPath
+	attachments[1] = audioPath
+	attachments[2] = imagePath
+
 	//发送邮件
-	sendEmail(requestDataArray, excelPath,orderNumber)
+	sendEmail(requestDataArray, attachments,orderNumber)
 	//发送短信
 	//clientNum := body[constants.Mobile]
         //sendSms(orderNumber, clientNum)
@@ -380,23 +399,33 @@ func (this *RepairController) GetAccessToken() string {
 	result := make(map[string]interface{})
 	fmt.Println("get js api ticket....................")
 
+	accessToken, getAccessTokenErr := GetAccessTokenByWeixinAPI()
+	this.HandleError(result, getAccessTokenErr)
+
+	return accessToken
+
+}
+
+func GetAccessTokenByWeixinAPI() (string, error) {
 	accessToken, getAccessTokenErr := utils.GetAccessToken()
 	if accessToken == "" {
 		url := "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid="+AppId+"&secret="+AppSecret
 		beego.Info("access_token for jsapiticket: "+ url)
 		resBody, err := SendHttpRequest(url)
-		this.HandleError(result, err)
+		if err != nil {
+			return "", err
+		}
 		beego.Info("res body from token api: ")
 		beego.Info(string(resBody))
 		accessToken, getAccessTokenErr = getAccessToken(resBody)
 		beego.Info("accessToken for jsapiticket: "+ accessToken)
-		this.HandleError(result, getAccessTokenErr)
 
+		if getAccessTokenErr != nil {
+			return "", getAccessTokenErr
+		}
 		utils.WriteAccessToken(accessToken)
 	}
-
-	return accessToken
-
+	return accessToken, nil
 }
 
 func SendHttpRequest(url string) ([]byte,error) {
@@ -665,7 +694,7 @@ func generateExcel(body []string, orderId string) string {
 	return excelPath
 }
 
-func sendEmail(requestDataArray []string, excelPath string, orderNumber string )  {
+func sendEmail(requestDataArray []string, atts []string, orderNumber string )  {
 	//from string, to []string, cc string, subject string, contentType string, body string, attachments ...string
 
 	from := beego.AppConfig.String(constants.EmailUser)
@@ -696,7 +725,7 @@ func sendEmail(requestDataArray []string, excelPath string, orderNumber string )
 			</table>
 			<p>&nbsp;</p>`
 
-	attachment := []string{excelPath}
+	attachment := atts
 
 	utils.SendEmail(from, to, cc, subject, contentType, body, attachment...)
 }
@@ -737,6 +766,58 @@ func validEngineerOperations(body map[string]string) error  {
 	return nil
 }
 
+
+func GetAudioFromWeixinServer(orderId string, mediaId string) (string, error) {
+	binaryPath := BinaryRootPath + orderId
+	if !PathExists(binaryPath) {
+		os.MkdirAll(binaryPath, 0644)
+	}
+	audioName := strconv.FormatInt(time.Now().Unix(), 10) + ".amr"
+	result := binaryPath + "/" + audioName
+	accessToken, getAccessTokenErr := GetAccessTokenByWeixinAPI()
+	if getAccessTokenErr != nil {
+		return "", getAccessTokenErr
+	}
+	audioUrl := "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token="+accessToken+"&media_id=" + mediaId
+
+	getAudioCmd := exec.Command("wget",  "-o", result, audioUrl)
+	getAudioOutput, getAudioError := getAudioCmd.CombinedOutput()
+	beego.Info(string(getAudioOutput))
+	if getAudioError != nil {
+		return "", getAudioError
+	}
+	return result, nil
+}
+
+func GetImagesFromWeixinServer(orderId string, mediaId string) (string, error) {
+	binaryPath := BinaryRootPath + orderId
+	if !PathExists(binaryPath) {
+		os.MkdirAll(binaryPath, 0644)
+	}
+	imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".jpeg"
+	result := binaryPath + "/" + imageName
+	accessToken, getAccessTokenErr := GetAccessTokenByWeixinAPI()
+	if getAccessTokenErr != nil {
+		return "", getAccessTokenErr
+	}
+	imageUrl := "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token="+accessToken+"&media_id=" + mediaId
+
+	getImageCmd := exec.Command("wget",  "-o", result, imageUrl)
+	getImageOutput, getImageError := getImageCmd.CombinedOutput()
+	beego.Info(string(getImageOutput))
+	if getImageError != nil {
+		return "", getImageError
+	}
+	return result, nil
+}
+
+func PathExists(path string) bool {
+	var exist = true
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		exist = false
+	}
+	return exist
+}
 
 func (this *RepairController) HandleError (result map[string]interface{}, err error) {
 	if err != nil {
