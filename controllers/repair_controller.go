@@ -233,7 +233,7 @@ func (this *RepairController) GetWeixinCode()  {
 }
 
 func (this *RepairController) GetUserInfo()  {
-	result := make(map[string]interface{})
+
 	fmt.Println("get user info....................")
 	var code string
 	var state string
@@ -241,6 +241,16 @@ func (this *RepairController) GetUserInfo()  {
 	this.Ctx.Input.Bind(&code, "code")
 	fmt.Println("code: " + code)
 	fmt.Println("state: " + state)
+
+	go this.GetUserDetailAsync(code)
+
+
+	this.Ctx.ResponseWriter.Write([]byte(code))
+}
+
+func (this *RepairController) GetUserDetailAsync(code string)  {
+	beego.Info("get user detail async by code: " + code)
+	result := make(map[string]interface{})
 
 	url := "https://api.weixin.qq.com/sns/oauth2/access_token?appid="+AppId+"&secret="+AppSecret+"&code="+code+"&grant_type=authorization_code"
 	beego.Info("access_token: "+ url)
@@ -316,9 +326,6 @@ func (this *RepairController) GetUserInfo()  {
 
 	beego.Info("forwardUrl: " + forwardUrl)
 	this.Redirect(forwardUrl, http.StatusMovedPermanently)
-
-
-	//this.Ctx.Redirect(, )
 }
 
 func (this *RepairController) GetJSApiTicket()  {
