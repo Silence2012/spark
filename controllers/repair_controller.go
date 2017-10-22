@@ -366,6 +366,7 @@ func (this *RepairController) GetJSApiTicket()  {
 		utils.WriteTicket(ticket)
 	}
 
+	beego.Info("ticket:" + ticket)
 	result["jsapi_ticket"] = ticket
 	result["appId"] = AppId
 	response, marshalErr := json.Marshal(result)
@@ -729,10 +730,7 @@ func validEngineerOperations(body map[string]string) error  {
 
 
 func (this *RepairController) HandleError (result map[string]interface{}, err error) {
-	beego.Info("handle err: ")
-	beego.Info(err)
 	if err != nil {
-		beego.Info("err is not nil")
 		this.Ctx.Output.Status = 503
 		result[constants.ERROR] = err.Error()
 		response, _ := json.Marshal(result)
