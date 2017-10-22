@@ -784,7 +784,7 @@ func GetAudioFromWeixinServer(orderId string, mediaId string) (string, error) {
 		return "", getAccessTokenErr
 	}
 	audioUrl := "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token="+accessToken+"&media_id=" + mediaId
-
+	beego.Info("audioUrl: "+ audioUrl)
 	getAudioCmd := exec.Command("wget",  "-o", result, audioUrl)
 	getAudioOutput, getAudioError := getAudioCmd.CombinedOutput()
 	beego.Info(string(getAudioOutput))
@@ -806,7 +806,7 @@ func GetImagesFromWeixinServer(orderId string, mediaId string) (string, error) {
 		return "", getAccessTokenErr
 	}
 	imageUrl := "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token="+accessToken+"&media_id=" + mediaId
-
+	beego.Info("imageUrl: "+ imageUrl)
 	getImageCmd := exec.Command("wget",  "-o", result, imageUrl)
 	getImageOutput, getImageError := getImageCmd.CombinedOutput()
 	beego.Info(string(getImageOutput))
