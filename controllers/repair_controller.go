@@ -354,7 +354,7 @@ func (this *RepairController) GetJSApiTicket()  {
 	beego.Info("get ticket from redis error: ")
 	beego.Info(ticketErr)
 	beego.Info("ticket1: " + ticket)
-	this.HandleError(result, ticketErr)
+
 	beego.Info("ticket: " + ticket)
 	if ticket == "" {
 		jsApiTicketUrl := "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token="+accessToken+"&type=jsapi"
