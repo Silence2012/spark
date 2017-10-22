@@ -113,21 +113,21 @@ func (this *RepairController) SaveRepairForm() {
 	var attachments []string
 	if audioPath == "" && imagePath == "" {
 		beego.Info("audio path and image path are empty")
-		attachments := make([]string, 1)
+		attachments = make([]string, 1)
 		attachments[0] = excelPath
 	} else if audioPath == "" && imagePath != "" {
 		beego.Info("audio path is empty and image path is not empty")
-		attachments := make([]string, 2)
+		attachments = make([]string, 2)
 		attachments[0] = excelPath
 		attachments[1] = imagePath
 	} else if audioPath != "" && imagePath == "" {
 		beego.Info("audio path is not empty and image path is empty")
-		attachments := make([]string, 2)
+		attachments = make([]string, 2)
 		attachments[0] = excelPath
 		attachments[1] = audioPath
 	} else if audioPath != "" && imagePath != ""{
 		beego.Info("audio path is not empty and image path is not empty")
-		attachments := make([]string, 3)
+		attachments = make([]string, 3)
 		attachments[0] = excelPath
 		attachments[1] = audioPath
 		attachments[2] = imagePath
@@ -831,7 +831,7 @@ func GetImagesFromWeixinServerByGoHttp(orderId string, mediaId string) (string, 
 	if !PathExists(binaryPath) {
 		os.MkdirAll(binaryPath, 0777)
 	}
-	imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".jpeg"
+	imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".jpg"
 	result := binaryPath + "/" + imageName
 	accessToken, getAccessTokenErr := GetAccessTokenByWeixinAPI()
 	if getAccessTokenErr != nil {
