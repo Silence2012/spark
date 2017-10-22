@@ -327,7 +327,7 @@ func (this *RepairController) GetUserDetailAsync(code string)  {
 			break
 		} else {
 			forwardUrl = commonUrl
-			break
+
 		}
 	}
 
