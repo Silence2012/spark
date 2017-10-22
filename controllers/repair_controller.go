@@ -797,7 +797,7 @@ func GetAudioFromWeixinServer(orderId string, mediaId string) (string, error) {
 func GetImagesFromWeixinServer(orderId string, mediaId string) (string, error) {
 	binaryPath := BinaryRootPath + orderId
 	if !PathExists(binaryPath) {
-		os.MkdirAll(binaryPath, 0644)
+		os.MkdirAll(binaryPath, 0777)
 	}
 	imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".jpeg"
 	result := binaryPath + "/" + imageName
