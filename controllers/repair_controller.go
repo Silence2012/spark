@@ -770,7 +770,7 @@ func validEngineerOperations(body map[string]string) error  {
 func GetAudioFromWeixinServer(orderId string, mediaId string) (string, error) {
 	binaryPath := BinaryRootPath + orderId
 	if !PathExists(binaryPath) {
-		os.MkdirAll(binaryPath, 0644)
+		os.MkdirAll(binaryPath, 0777)
 	}
 	audioName := strconv.FormatInt(time.Now().Unix(), 10) + ".amr"
 	result := binaryPath + "/" + audioName
