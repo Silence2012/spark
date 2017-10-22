@@ -280,7 +280,7 @@ func (this *RepairController) GetUserDetailAsync(code string)  {
 	beego.Info(data.Country)
 	beego.Info(data.HeadImgUrl)
 
-	var userInfo interface{}
+	var userInfo models.UserInfo
 
 	if data.OpenId != "" {
 		beego.Info("open id is not empty...")
@@ -293,7 +293,7 @@ func (this *RepairController) GetUserDetailAsync(code string)  {
 		beego.Info(userInfo)
 	}
 	if code != "" {
-		updateErr := models.AddWeixinUserInfo(data)
+		updateErr := models.AddWeixinUserInfo(data, code)
 		this.HandleError(result, updateErr)
 	}
 
@@ -308,7 +308,7 @@ func (this *RepairController) GetUserDetailAsync(code string)  {
 	}else if openId != "" {
 		compareId = openId
 	} else {
-		//compareId = userInfo.OpenId
+		compareId = userInfo.OpenId
 	}
 	for _, whiteId := range whiteLists {
 		whiteId = strings.TrimSpace(whiteId)

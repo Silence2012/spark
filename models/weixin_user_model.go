@@ -20,7 +20,7 @@ type UserInfo struct {
 	Privilege []string `json: "privilege"`
 }
 
-func AddWeixinUserInfo(userData UserInfo) error {
+func AddWeixinUserInfo(userData UserInfo, code string) error {
 	beego.Info("add weixin user info....")
 	beego.Info(userData)
 	session, err := InitMongodbSession()
@@ -32,7 +32,7 @@ func AddWeixinUserInfo(userData UserInfo) error {
 	c := session.DB("ndc").C("weixin_user")
 
 	_, updateErr := c.Upsert(bson.M{"openid": userData.OpenId}, bson.M{"$set": bson.M{
-		"code": userData.Code,
+		"code": code,
 		"openid": userData.OpenId,
 		"nickname": userData.NickName,
 		"sex": userData.Sex,
@@ -50,7 +50,7 @@ func AddWeixinUserInfo(userData UserInfo) error {
 	return nil
 }
 
-func GetWeixinUserInfo(code string) interface{} {
+func GetWeixinUserInfo(code string) UserInfo {
 	beego.Info("get weixin user by openid: "+ code)
 
 	session, _ := InitMongodbSession()
@@ -59,7 +59,7 @@ func GetWeixinUserInfo(code string) interface{} {
 
 	c := session.DB("ndc").C("weixin_user")
 
-	var result interface{}
+	var result UserInfo
 	queryErr := c.Find(bson.M{"code": code}).One(&result)
 	fmt.Println(queryErr)
 
