@@ -242,10 +242,9 @@ func (this *RepairController) GetUserInfo()  {
 	fmt.Println("code: " + code)
 	fmt.Println("state: " + state)
 
-	go this.GetUserDetailAsync(code)
+	this.GetUserDetailAsync(code)
 
 
-	this.Ctx.ResponseWriter.Write([]byte(code))
 }
 
 func (this *RepairController) GetUserDetailAsync(code string)  {
@@ -275,6 +274,7 @@ func (this *RepairController) GetUserDetailAsync(code string)  {
 	var data models.UserInfo
 	marshalErr := json.Unmarshal(resBody, &data)
 	this.HandleError(result, marshalErr)
+	beego.Info("userinfo from controller: ")
 	beego.Info(data.OpenId)
 	beego.Info(data.City)
 	beego.Info(data.Country)
@@ -284,6 +284,11 @@ func (this *RepairController) GetUserDetailAsync(code string)  {
 
 	if data.OpenId != "" {
 		beego.Info("open id is not empty...")
+		if code != "" {
+			beego.Info("upsert weixin user:")
+			updateErr := models.AddWeixinUserInfo(data, code)
+			this.HandleError(result, updateErr)
+		}
 
 	} else {
 		beego.Info("open id is empty, CODE: "+ code)
@@ -292,10 +297,7 @@ func (this *RepairController) GetUserDetailAsync(code string)  {
 		beego.Info("get userInfo from cache.....")
 		beego.Info(userInfo)
 	}
-	if code != "" {
-		updateErr := models.AddWeixinUserInfo(data, code)
-		this.HandleError(result, updateErr)
-	}
+
 
 	openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
 	whiteLists := strings.Split(openIdWhiteListWithComma, ",")
@@ -304,14 +306,18 @@ func (this *RepairController) GetUserDetailAsync(code string)  {
 
 	var compareId string
 	if data.OpenId != "" {
+		beego.Info("get compareid data.openid is not empty....")
 		compareId = data.OpenId
 	}else if openId != "" {
+		beego.Info("get compareid data.openid is empty, get compareid from openid....")
 		compareId = openId
 	} else {
+		beego.Info("get compareid from cache...." + userInfo.OpenId)
 		compareId = userInfo.OpenId
 	}
 	for _, whiteId := range whiteLists {
 		whiteId = strings.TrimSpace(whiteId)
+		compareId = strings.TrimSpace(compareId)
 		fmt.Println("whiteId: "+ whiteId)
 		fmt.Println("openId: "+ data.OpenId)
 		//fmt.Println("userInfo.openId: "+ userInfo.OpenId)
