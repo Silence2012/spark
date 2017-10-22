@@ -324,9 +324,10 @@ func (this *RepairController) GetUserDetailAsync(code string)  {
 
 		if compareId == whiteId {
 			forwardUrl = adminUrl
+			break
 		} else {
 			forwardUrl = commonUrl
-
+			break
 		}
 	}
 
