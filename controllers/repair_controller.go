@@ -16,6 +16,7 @@ import (
 	"os"
 	"strconv"
 	"time"
+	"math/rand"
 )
 
 type RepairController struct {
@@ -850,7 +851,7 @@ func GetImagesFromWeixinServerByGoHttp(orderId string, mediaId string) (string, 
 	if !PathExists(binaryPath) {
 		os.MkdirAll(binaryPath, 0777)
 	}
-	imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".jpg"
+	imageName := strconv.FormatInt(time.Now().Unix(), 10)+ "_" + strconv.Itoa(rand.Intn(10000)) + ".jpg"
 	result := binaryPath + "/" + imageName
 	accessToken, getAccessTokenErr := GetAccessTokenByWeixinAPI()
 	if getAccessTokenErr != nil {
