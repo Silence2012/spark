@@ -112,23 +112,28 @@ func (this *RepairController) SaveRepairForm() {
 
 	var attachments []string
 	if audioPath == "" && imagePath == "" {
+		beego.Info("audio path and image path are empty")
 		attachments := make([]string, 1)
 		attachments[0] = excelPath
 	} else if audioPath == "" && imagePath != "" {
+		beego.Info("audio path is empty and image path is not empty")
 		attachments := make([]string, 2)
 		attachments[0] = excelPath
 		attachments[1] = imagePath
 	} else if audioPath != "" && imagePath == "" {
+		beego.Info("audio path is not empty and image path is empty")
 		attachments := make([]string, 2)
 		attachments[0] = excelPath
 		attachments[1] = audioPath
 	} else if audioPath != "" && imagePath != ""{
+		beego.Info("audio path is not empty and image path is not empty")
 		attachments := make([]string, 3)
 		attachments[0] = excelPath
 		attachments[1] = audioPath
 		attachments[2] = imagePath
 	}
-
+	beego.Info("attachments: ")
+	beego.Info(attachments)
 
 	//发送邮件
 	sendEmail(requestDataArray, attachments,orderNumber)
