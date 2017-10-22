@@ -688,7 +688,10 @@ func generateExcel(body []string, orderId string) string {
 	excelData = make([]map[int][]string, 1)
 	excelData[0] = content
 
-	excelPath := beego.AppConfig.String(constants.ExcelDir) + orderId + ".xlsx"
+	excelPath := BinaryRootPath + orderId + ".xlsx"
+	if !PathExists(BinaryRootPath) {
+		os.MkdirAll(BinaryRootPath, 0777)
+	}
 	utils.GenerateExcel(titleArray, excelData, excelPath)
 
 	return excelPath
