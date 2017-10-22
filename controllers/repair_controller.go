@@ -95,8 +95,8 @@ func (this *RepairController) SaveRepairForm() {
 	body[constants.OrderId] = orderNumber
 	audioId, _ := body[constants.AudioMediaId]
 	imageId, _ := body[constants.ImageMediaId]
-	audioPath, audioErr := GetAudioFromWeixinServer(orderNumber, audioId)
-	imagePath, imageErr := GetImagesFromWeixinServer(orderNumber, imageId)
+	audioPath, audioErr := GetAudioFromWeixinServerByGoHttp(orderNumber, audioId)
+	imagePath, imageErr := GetImagesFromWeixinServerByGoHttp(orderNumber, imageId)
 	beego.Info("download audio err:")
 	beego.Info(audioErr)
 	beego.Info("download image err:")
@@ -771,6 +771,56 @@ func validEngineerOperations(body map[string]string) error  {
 	return nil
 }
 
+func GetAudioFromWeixinServerByGoHttp(orderId string, mediaId string) (string, error) {
+	binaryPath := BinaryRootPath + orderId
+	if !PathExists(binaryPath) {
+		os.MkdirAll(binaryPath, 0777)
+	}
+	audioName := strconv.FormatInt(time.Now().Unix(), 10) + ".amr"
+	result := binaryPath + "/" + audioName
+
+	accessToken, getAccessTokenErr := GetAccessTokenByWeixinAPI()
+	beego.Info(getAccessTokenErr)
+	audioUrl := "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token="+accessToken+"&media_id=" + mediaId
+	beego.Info("audioUrl: "+ audioUrl)
+
+	audioBytes, err := SendHttpRequest(audioUrl)
+	if err != nil {
+		return "", err
+	}
+
+	writeErr := ioutil.WriteFile(result, audioBytes, 0777)
+	if writeErr != nil {
+		return "", writeErr
+	}
+
+	return result, nil
+}
+
+func GetImagesFromWeixinServerByGoHttp(orderId string, mediaId string) (string, error) {
+	binaryPath := BinaryRootPath + orderId
+	if !PathExists(binaryPath) {
+		os.MkdirAll(binaryPath, 0777)
+	}
+	imageName := strconv.FormatInt(time.Now().Unix(), 10) + ".jpeg"
+	result := binaryPath + "/" + imageName
+	accessToken, getAccessTokenErr := GetAccessTokenByWeixinAPI()
+	if getAccessTokenErr != nil {
+		return "", getAccessTokenErr
+	}
+	imageUrl := "http://file.api.weixin.qq.com/cgi-bin/media/get?access_token="+accessToken+"&media_id=" + mediaId
+
+	imageBytes, err := SendHttpRequest(imageUrl)
+	if err != nil {
+		return "", err
+	}
+	writeErr := ioutil.WriteFile(result, imageBytes, 0777)
+	if writeErr != nil {
+		return "", writeErr
+	}
+
+	return result, nil
+}
 
 func GetAudioFromWeixinServer(orderId string, mediaId string) (string, error) {
 	binaryPath := BinaryRootPath + orderId
