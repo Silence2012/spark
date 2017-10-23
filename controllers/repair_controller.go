@@ -17,6 +17,7 @@ import (
 	"strconv"
 	"time"
 	"math/rand"
+	"debug/elf"
 )
 
 type RepairController struct {
@@ -286,7 +287,16 @@ func (this *RepairController) TopOrder()  {
 
 func (this *RepairController) GetWeixinCode()  {
 	beego.Info("get weixin token ............")
-	SendHttpRequest("https://open.weixin.qq.com/connect/oauth2/authorize?appid="+AppId+"&redirect_uri="+Domain+"/repairs/weixin-token&response_type=code&scope=snsapi_userinfo&state=1")
+	paramMap := this.Ctx.Input.Params()
+	beego.Info("paramMap: ")
+	beego.Info(paramMap)
+	code, codeExisted := paramMap[":code"]
+	if !codeExisted || code == "" {
+		result := make(map[string]interface{})
+		err := errors.New("请检查code")
+		this.HandleError(result, err)
+	}
+	this.GetUserDetailAsync(code)
 }
 
 func (this *RepairController) GetUserInfo()  {
@@ -303,6 +313,92 @@ func (this *RepairController) GetUserInfo()  {
 
 
 }
+func (this *RepairController) GetUserDetailByCode(code string)  {
+	beego.Info("get user detail async by code: " + code)
+	result := make(map[string]interface{})
+
+	url := "https://api.weixin.qq.com/sns/oauth2/access_token?appid="+AppId+"&secret="+AppSecret+"&code="+code+"&grant_type=authorization_code"
+	beego.Info("access_token: "+ url)
+	resBody, err := SendHttpRequest(url)
+	this.HandleError(result, err)
+	accessToken, openId, getAccessTokenErr := getAccessTokenAndOpenId(resBody)
+	beego.Info("accessToken: "+ accessToken)
+	beego.Info("openId: "+ openId)
+	this.HandleError(result, getAccessTokenErr)
+
+	fmt.Println(".............................")
+
+	userInfoUrl := "https://api.weixin.qq.com/sns/userinfo?access_token="+accessToken+"&openid="+ openId
+	resBody, getUserInfoErr := SendHttpRequest(userInfoUrl)
+	this.HandleError(result, getUserInfoErr)
+
+
+	var data models.UserInfo
+	marshalErr := json.Unmarshal(resBody, &data)
+	this.HandleError(result, marshalErr)
+	beego.Info("userinfo from controller: ")
+	beego.Info(data.OpenId)
+	beego.Info(data.City)
+	beego.Info(data.Country)
+	beego.Info(data.HeadImgUrl)
+
+	var userInfo models.UserInfo
+
+	if data.OpenId != "" {
+		beego.Info("open id is not empty...")
+		if code != "" {
+			beego.Info("upsert weixin user:")
+			updateErr := models.AddWeixinUserInfo(data, code)
+			this.HandleError(result, updateErr)
+		}
+
+	} else {
+		beego.Info("open id is empty, CODE: "+ code)
+		userInfo = models.GetWeixinUserInfo(code)
+		beego.Info("open id is empty....")
+		beego.Info("get userInfo from cache.....")
+		beego.Info(userInfo)
+	}
+
+
+	openIdWhiteListWithComma := beego.AppConfig.String(constants.OpenIdWhiteList)
+	whiteLists := strings.Split(openIdWhiteListWithComma, ",")
+	fmt.Println("whitelists:")
+	fmt.Println(whiteLists)
+
+	var compareId string
+	if data.OpenId != "" {
+		beego.Info("get compareid data.openid is not empty....")
+		compareId = data.OpenId
+	}else if openId != "" {
+		beego.Info("get compareid data.openid is empty, get compareid from openid....")
+		compareId = openId
+	} else {
+		beego.Info("get compareid from cache...." + userInfo.OpenId)
+		compareId = userInfo.OpenId
+	}
+
+	var resCode string
+	for _, whiteId := range whiteLists {
+		whiteId = strings.TrimSpace(whiteId)
+		compareId = strings.TrimSpace(compareId)
+		fmt.Println("whiteId: "+ whiteId)
+		fmt.Println("compareId: "+ compareId)
+		//fmt.Println("userInfo.openId: "+ userInfo.OpenId)
+
+		if compareId == whiteId {
+			resCode = "admin"
+			break
+		} else {
+			resCode = "common"
+
+		}
+	}
+
+	beego.Info("forwardUrl: " + resCode)
+	this.Ctx.Output.Body([]byte(resCode))
+}
+
 
 func (this *RepairController) GetUserDetailAsync(code string)  {
 	beego.Info("get user detail async by code: " + code)
