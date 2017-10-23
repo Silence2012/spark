@@ -22,6 +22,7 @@ const (
 	BugDetail = "bugDetail"
 	AudioMediaId = "audioMediaId"
 	ImageMediaId = "imageMediaId"
+	ImageUrlArray = "imageUrlArray"
 
 	OrderId = "orderId"
 

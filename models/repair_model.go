@@ -97,6 +97,7 @@ type RepairForm struct {
 	AudioMediaId string
 	//图片id
 	ImageMediaId []string
+	ImageUrls []string
 }
 
 type RepairOrder struct {
@@ -113,7 +114,7 @@ func InitMongodbSession() (*mgo.Session, error) {
 	return session, nil
 }
 
-func AddRepairForm(repairFormMap map[string]string) error {
+func AddRepairForm(repairFormMap map[string]string, imageUrlArray []string) error {
 	session, err := InitMongodbSession()
 	if err != nil {
 		return err
@@ -158,7 +159,7 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			0,
 			audioId,
 			imageIdArray,
-
+		    imageUrlArray,
 		})
 	if err != nil {
 		return err

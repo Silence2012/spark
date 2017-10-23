@@ -100,13 +100,22 @@ func (this *RepairController) SaveRepairForm() {
 
 	audioPath, audioErr := GetAudioFromWeixinServerByGoHttp(orderNumber, audioId)
 	imageArray := DownloadImages(orderNumber, imageIdArray)
+	imageUrlArray := make([]string, len(imageArray))
+	for index, imagePath := range imageArray {
+		imageUrls := strings.Split(imagePath, BinaryRootPath)
+		if len(imageUrls) > 0 {
+			imageUrl := Domain + "/" + imageUrls[1];
+			imageUrlArray[index] = imageUrl
+		}
+	}
+
 
 	beego.Info("download audio err:")
 	beego.Info(audioErr)
 	beego.Info("imageArray:")
 	beego.Info(imageArray)
 	//持久化输入项
-	addErr := models.AddRepairForm(body)
+	addErr := models.AddRepairForm(body, imageUrlArray)
 	if addErr != nil {
 		this.HandleError(result, addErr)
 	}
@@ -926,8 +935,10 @@ func GetAudioFromWeixinServerByGoHttp(orderId string, mediaId string) (string, e
 	return result, nil
 }
 
-func DownloadImages(orderId string, mediaIds []string) []string  {
+// return 1 本地路径，2 url
+func DownloadImages(orderId string, mediaIds []string) []string {
 	result := make([]string, len(mediaIds))
+
 	for index, mediaId := range mediaIds {
 		imagePath, _ := GetImagesFromWeixinServerByGoHttp(orderId, mediaId)
 		result[index] = imagePath
