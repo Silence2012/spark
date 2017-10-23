@@ -17,7 +17,6 @@ import (
 	"strconv"
 	"time"
 	"math/rand"
-	"debug/elf"
 )
 
 type RepairController struct {
