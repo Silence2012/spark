@@ -104,7 +104,7 @@ func (this *RepairController) SaveRepairForm() {
 	for index, imagePath := range imageArray {
 		imageUrls := strings.Split(imagePath, BinaryRootPath)
 		if len(imageUrls) > 0 {
-			imageUrl := Domain + "/" + imageUrls[1];
+			imageUrl := Domain + "/img/" + imageUrls[1];
 			imageUrlArray[index] = imageUrl
 		}
 	}
