@@ -8,6 +8,7 @@ import (
 	"../constants"
 	"time"
 	"strconv"
+	"strings"
 )
 
 //报修， 只要客户提交了报修单，那么这里就算完成了
@@ -120,6 +121,12 @@ func AddRepairForm(repairFormMap map[string]string) error {
 	defer session.Close()
 
 	c := session.DB("ndc").C("repairforms")
+	imageIdWithComma := repairFormMap[constants.ImageMediaId]
+	var imageIdArray []string
+
+	if imageIdWithComma != "" {
+		imageIdArray = strings.Split(imageIdWithComma, ",")
+	}
 
 	err = c.Insert(&RepairForm{
 			repairFormMap[constants.Company],
@@ -146,8 +153,8 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			},
 			false,
 			0,
-			"",
-			nil,
+			repairFormMap[constants.AudioMediaId],
+			imageIdArray,
 
 		})
 	if err != nil {
