@@ -122,12 +122,15 @@ func AddRepairForm(repairFormMap map[string]string) error {
 
 	c := session.DB("ndc").C("repairforms")
 	imageIdWithComma := repairFormMap[constants.ImageMediaId]
+	beego.Info("imageIdwithComma: "+ imageIdWithComma)
 	var imageIdArray []string
 
 	if imageIdWithComma != "" {
 		imageIdArray = strings.Split(imageIdWithComma, ",")
 	}
 
+	audioId := repairFormMap[constants.AudioMediaId]
+	beego.Info("audioId: "+ audioId)
 	err = c.Insert(&RepairForm{
 			repairFormMap[constants.Company],
 			repairFormMap[constants.Region],
@@ -153,7 +156,7 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			},
 			false,
 			0,
-			repairFormMap[constants.AudioMediaId],
+			audioId,
 			imageIdArray,
 
 		})
