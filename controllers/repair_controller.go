@@ -296,7 +296,7 @@ func (this *RepairController) GetWeixinCode()  {
 		err := errors.New("请检查code")
 		this.HandleError(result, err)
 	}
-	this.GetUserDetailAsync(code)
+	this.GetUserDetailByCode(code)
 }
 
 func (this *RepairController) GetUserInfo()  {
