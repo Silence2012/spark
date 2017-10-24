@@ -103,8 +103,11 @@ func (this *RepairController) SaveRepairForm() {
 	imageUrlArray := make([]string, len(imageArray))
 	for index, imagePath := range imageArray {
 		imageUrls := strings.Split(imagePath, BinaryRootPath)
+		beego.Info("image url :" )
+		beego.Info(imageUrls)
 		if len(imageUrls) > 0 {
-			imageUrl := Domain + "/img/" + imageUrls[1];
+
+			imageUrl := Domain + "/img/" + imageUrls[1]
 			imageUrlArray[index] = imageUrl
 		}
 	}
