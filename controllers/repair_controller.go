@@ -98,18 +98,26 @@ func (this *RepairController) SaveRepairForm() {
 	imageIds, _ := body[constants.ImageMediaId]
 	imageIdArray := strings.Split(imageIds, ",")
 
+	var imageUrlArray []string
+	var imageArray []string
 	audioPath, audioErr := GetAudioFromWeixinServerByGoHttp(orderNumber, audioId)
-	imageArray := DownloadImages(orderNumber, imageIdArray)
-	imageUrlArray := make([]string, len(imageArray))
-	for index, imagePath := range imageArray {
-		imageUrls := strings.Split(imagePath, BinaryRootPath)
-		beego.Info("image url :" )
-		beego.Info(imageUrls)
-		if len(imageUrls) > 0 {
+	if imageIds != "" {
+		beego.Info("下载图片....")
+		imageArray = DownloadImages(orderNumber, imageIdArray)
+		imageUrlArray = make([]string, len(imageArray))
 
-			imageUrl := Domain + "/img/" + imageUrls[1]
-			imageUrlArray[index] = imageUrl
+		for index, imagePath := range imageArray {
+			imageUrls := strings.Split(imagePath, BinaryRootPath)
+			beego.Info("image url :" )
+			beego.Info(imageUrls)
+			if len(imageUrls) > 0 {
+
+				imageUrl := Domain + "/img/" + imageUrls[1]
+				imageUrlArray[index] = imageUrl
+			}
 		}
+	}else {
+		beego.Info("没有上传图片")
 	}
 
 
