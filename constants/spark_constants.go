@@ -20,20 +20,30 @@ const (
 	BillAddress = "billAddress"
 	CompanyAddress = "companyAddress"
 	BugDetail = "bugDetail"
+	AudioMediaId = "audioMediaId"
+	ImageMediaId = "imageMediaId"
+	ImageUrlArray = "imageUrlArray"
 
 	OrderId = "orderId"
+
+	Top = "top"
 
 	EngineerName = "engineerName"
 	EngineerMobile = "engineerMobile"
 	HomeServiceTime = "homeServiceTime"
 	Notes = "notes"
 	FixCompleted = "fixcompleted"
+	FixCompletedTime = "fixcompletedtime"
 	SMSUser = "smsUser"
+	RepairTime = "repairTime"
+	SelectedOption = "selectedOption"
+	SMSServer = "http://127.0.0.1:8000/sendSms"
 
 	EmailHost = "emailHost"
 	EmailPort = "emailPort"
 	EmailUser = "emailUser"
 	EmailPwd = "emailPwd"
+	EmailList = "emailList"
 
 	//未处理new，正在处理handling，已经完成complete
 	OrderNew = "new"
@@ -42,4 +52,10 @@ const (
 
 
 	ExcelDir = "excelDir"
+
+	OpenIdWhiteList = "openIdWhiteList"
+
+	RedisIp = "redisIP"
+	RedisPort = "redisPort"
+	RedisPassword = "redisPassword"
 )

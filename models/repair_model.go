@@ -8,6 +8,7 @@ import (
 	"../constants"
 	"time"
 	"strconv"
+	"strings"
 )
 
 //报修， 只要客户提交了报修单，那么这里就算完成了
@@ -30,6 +31,7 @@ type Engineer struct {
 	Homeservice     bool
 	//上门服务时间
 	Homeservicetime int64
+
 	Notes           string
 	//维修是否已完成
 	Complete        bool
@@ -37,12 +39,16 @@ type Engineer struct {
 	Smsuser         bool
 	//工程师更新状态时间, 如果时间不为零，说明工程师更新过状态，否则认为工程师没进行任何操作
 	Time int64
+	//维修时间
+	RepairTime int64
+	//选项
+	SelectedOption string
 }
 
 type OrderLog struct {
 	Report *Report
 	Servicecenter *Servicecenter
-	Engineer *Engineer
+	Engineers[] *Engineer
 }
 
 type RepairForm struct {
@@ -79,8 +85,19 @@ type RepairForm struct {
 	OrderId string
 	//提交报修单时间
 	SubmitTime int64
+	//订单维修完成时间
+	FixCompletedTime int64
 	//报修单状态
 	OrderLog *OrderLog
+	//是否置顶，默认false
+	Top bool
+	//置顶时间
+	TopTime int64
+	//录音id
+	AudioMediaId string
+	//图片id
+	ImageMediaId []string
+	ImageUrls []string
 }
 
 type RepairOrder struct {
@@ -97,7 +114,7 @@ func InitMongodbSession() (*mgo.Session, error) {
 	return session, nil
 }
 
-func AddRepairForm(repairFormMap map[string]string) error {
+func AddRepairForm(repairFormMap map[string]string, imageUrlArray []string) error {
 	session, err := InitMongodbSession()
 	if err != nil {
 		return err
@@ -105,6 +122,16 @@ func AddRepairForm(repairFormMap map[string]string) error {
 	defer session.Close()
 
 	c := session.DB("ndc").C("repairforms")
+	imageIdWithComma := repairFormMap[constants.ImageMediaId]
+	beego.Info("imageIdwithComma: "+ imageIdWithComma)
+	var imageIdArray []string
+
+	if imageIdWithComma != "" {
+		imageIdArray = strings.Split(imageIdWithComma, ",")
+	}
+
+	audioId := repairFormMap[constants.AudioMediaId]
+	beego.Info("audioId: "+ audioId)
 	err = c.Insert(&RepairForm{
 			repairFormMap[constants.Company],
 			repairFormMap[constants.Region],
@@ -122,12 +149,32 @@ func AddRepairForm(repairFormMap map[string]string) error {
 			constants.OrderNew,
 			repairFormMap[constants.OrderId],
 			time.Now().Unix(),
+			0,
 			&OrderLog{
 				&Report{time.Now().Unix(), true},
 			    &Servicecenter{time.Now().Unix(), true},
-			    &Engineer{},
+				nil,
 			},
+			false,
+			0,
+			audioId,
+			imageIdArray,
+		    imageUrlArray,
 		})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func RemoveCollection(orderId string) error {
+	session, err := InitMongodbSession()
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	c := session.DB("ndc").C("repairforms")
+	_, err = c.RemoveAll(bson.M{"orderid": orderId})
 	if err != nil {
 		return err
 	}
@@ -210,7 +257,7 @@ func GetRepairOrderStatus(orderId string) (interface{}, error) {
 	c := session.DB("ndc").C("repairforms")
 
 	var result interface{}
-	err = c.Find(bson.M{"orderid": orderId}).Select(bson.M{"orderlog": 1}).One(&result)
+	err = c.Find(bson.M{"orderid": orderId}).Select(bson.M{"orderlog": 1,"status":1,"fixcompletedtime":1}).One(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -243,7 +290,7 @@ func GetRepairFormListByOrderStatus(status string) ([]interface{}, error)  {
 
 	c := session.DB("ndc").C("repairforms")
 	var result []interface{}
-	err = c.Find(bson.M{"status": status}).Select(bson.M{"orderid": 1}).All(&result)
+	err = c.Find(bson.M{"status": status}).Select(bson.M{"orderid": 1}).Sort("-toptime", "-submittime").All(&result)
 	if err != nil {
 		return nil, err
 	}
@@ -255,13 +302,17 @@ func UpdateOrderLog(body map[string]string) error {
 	orderId := body[constants.OrderId]
 	engineerName := body[constants.EngineerName]
 	engineerMobile := body[constants.EngineerMobile]
-	//这个需要编程int64
+	//这个需要转换为int64
 	homeServiceTime := body[constants.HomeServiceTime]
 	notes := body[constants.Notes]
-	//这个需要编程bool
+	//这个需要转换为bool
 	fixCompleted := body[constants.FixCompleted]
-	//这个需要编程bool
+	//这个需要转换为bool
 	smsUser := body[constants.SMSUser]
+	//维修时间
+	repairTime := body[constants.RepairTime]
+	//选项
+	selectOption := body[constants.SelectedOption]
 
 	var homeServiceTimeInt int64
 	var fixCompletedBool bool
@@ -272,11 +323,17 @@ func UpdateOrderLog(body map[string]string) error {
 	fixCompletedBool, _ = strconv.ParseBool(fixCompleted)
 	smsUserBool, _ = strconv.ParseBool(smsUser)
 
-	if homeServiceTime == "" {
+	var fixCompletedTime int64
+	fixCompletedTime = 0
+
+	var repairTimeInt int64
+	repairTimeInt = 0
+
+	if homeServiceTime == "" || homeServiceTime == "0"{
 		homeServiceTimeInt = 0
 	} else {
 		//转化所需模板
-		timeLayout := "2017-10-06 15:04:05"
+		timeLayout := "2006-01-02"
 		//获取时区
 		loc, _ := time.LoadLocation("Local")
 		theTime, convertErr := time.ParseInLocation(timeLayout, homeServiceTime, loc)
@@ -285,6 +342,20 @@ func UpdateOrderLog(body map[string]string) error {
 		}
 		//转化为时间戳 类型是int64
 		homeServiceTimeInt = theTime.Unix()
+	}
+	if repairTime == "" {
+		repairTimeInt = 0
+	} else {
+		//转化所需模板
+		timeLayout := "2006-01-02"
+		//获取时区
+		loc, _ := time.LoadLocation("Local")
+		theTime, convertErr := time.ParseInLocation(timeLayout, repairTime, loc)
+		if convertErr != nil {
+			repairTimeInt = 0
+		}
+		//转化为时间戳 类型是int64
+		repairTimeInt = theTime.Unix()
 	}
 
 	if homeServiceTimeInt == 0 {
@@ -296,6 +367,7 @@ func UpdateOrderLog(body map[string]string) error {
 	var handleStatus string
 	if fixCompletedBool {
 		handleStatus = constants.OrderCompleted
+		fixCompletedTime = time.Now().Unix()
 	}else {
 		handleStatus = constants.OrderHandling
 	}
@@ -308,19 +380,60 @@ func UpdateOrderLog(body map[string]string) error {
 
 	c := session.DB("ndc").C("repairforms")
 
-	updateErr := c.Update(bson.M{"orderid": orderId}, bson.M{"$set": bson.M{
-														"orderlog.engineer.name": engineerName,
-														"orderlog.engineer.mobile": engineerMobile,
-														"orderlog.engineer.homeservice": homeService,
-														"orderlog.engineer.homeservicetime": homeServiceTimeInt,
-														"orderlog.engineer.notes": notes,
-														"orderlog.engineer.complete": fixCompletedBool,
-														"orderlog.engineer.smsuser": smsUserBool,
-														"orderlog.engineer.time": time.Now().Unix(),
-
-														"status": handleStatus,
+	updateErr := c.Update(bson.M{"orderid": orderId}, bson.M{"$push": bson.M{
+													    "orderlog.engineers": bson.M{
+															"name": engineerName,
+															"mobile": engineerMobile,
+															"homeservice": homeService,
+															"homeservicetime": homeServiceTimeInt,
+															"notes": notes,
+															"complete": fixCompletedBool,
+															"smsuser": smsUserBool,
+															"time": time.Now().Unix(),
+															"repairtime": repairTimeInt,
+															"selectedoption": selectOption,
+														},
 														}})
+	if updateErr != nil {
+		return updateErr
+	}
 
-	return updateErr
+	updateFixCompleteErr := c.Update(bson.M{"orderid": orderId}, bson.M{"$set": bson.M{
+		"fixcompletedtime": fixCompletedTime,
+		"status": handleStatus,
+		},
+	})
+
+	return updateFixCompleteErr
+
+}
+
+
+//orderId: 订单号，
+//top： true置顶 false取消置顶
+func TopOrderById(orderId string, top bool) error {
+
+	session, err := InitMongodbSession()
+	if err != nil {
+		return  err
+	}
+	defer session.Close()
+
+	c := session.DB("ndc").C("repairforms")
+
+	var topTime int64 = 0
+	if top {
+		topTime = time.Now().Unix()
+	}
+
+	updateErr := c.Update(bson.M{"orderid": orderId}, bson.M{"$set": bson.M{
+		"top": top,
+		"toptime": topTime,
+	}})
+	if updateErr != nil {
+		return updateErr
+	}
+
+	return nil
 
 }

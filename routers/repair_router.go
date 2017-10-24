@@ -16,7 +16,17 @@ func InitRepairRouter ()  {
 	//按订单状态查询订单列表，未处理new，正在处理handling，已经完成complete
 	beego.Router("/repairs/list/:orderstatus", &controllers.RepairController{}, "get:GetRepairFormListByOrderStatus")
 	//更新订单状态
-	beego.Router("/repairs/update", &controllers.RepairController{}, "put:UpdateRepairForm")
+	beego.Router("/repairs/update", &controllers.RepairController{}, "post:UpdateRepairForm")
 	//查看已完成订单详细情况
 	beego.Router("/repairs/complete/detail/:orderid", &controllers.RepairController{}, "get:QueryDetailByOrderId")
+	//订单置顶
+	beego.Router("/repairs/top", &controllers.RepairController{}, "post:TopOrder")
+	//通过微信API获取用户信息
+	beego.Router("/repairs/weixin-code/:code", &controllers.RepairController{}, "get:GetWeixinCode")
+	beego.Router("/repairs/weixin-token", &controllers.RepairController{}, "get:GetUserInfo")
+
+	//通过微信API获取jsapiticket
+	beego.Router("/repairs/weixin-jsapiticket", &controllers.RepairController{}, "get:GetJSApiTicket")
+	//根据订单id删除订单
+	beego.Router("/repairs/delete", &controllers.RepairController{}, "post:DeleteOrderId")
 }
