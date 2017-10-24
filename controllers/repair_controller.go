@@ -155,7 +155,7 @@ func (this *RepairController) SaveRepairForm() {
 	beego.Info(attachments)
 
 	//发送邮件
-	sendEmail(requestDataArray, attachments,orderNumber)
+	go sendEmail(requestDataArray, attachments,orderNumber)
 	//发送短信
 	//clientNum := body[constants.Mobile]
         //sendSms(orderNumber, clientNum)
@@ -833,7 +833,7 @@ func generateExcel(body []string, orderId string) string {
 
 func sendEmail(requestDataArray []string, atts []string, orderNumber string )  {
 	//from string, to []string, cc string, subject string, contentType string, body string, attachments ...string
-
+	beego.Info("sending email.....")
 	from := beego.AppConfig.String(constants.EmailUser)
 	//发送邮件给相关人员，邮箱配置在配置文件里以逗号隔开
 	toStringWithComma := beego.AppConfig.String(constants.EmailList)
