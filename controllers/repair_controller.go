@@ -155,7 +155,7 @@ func (this *RepairController) SaveRepairForm() {
 	beego.Info(attachments)
 
 	//发送邮件
-	go sendEmail(requestDataArray, attachments,orderNumber)
+	sendEmail(requestDataArray, attachments,orderNumber)
 	//发送短信
 	//clientNum := body[constants.Mobile]
         //sendSms(orderNumber, clientNum)
